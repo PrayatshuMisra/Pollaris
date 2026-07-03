@@ -215,11 +215,11 @@ function EditorPage() {
   if (presentationQ.error) return <div className="p-10 text-center">Presentation not found.</div>;
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-background">
       {/* toolbar */}
-      <div className="flex items-center justify-between gap-3 border-b border-white/5 bg-background/60 px-6 py-3 backdrop-blur-xl">
+      <div className="flex items-center justify-between gap-3 border-b border-border bg-background/80 px-6 py-3 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground">
+          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <Input
@@ -228,16 +228,16 @@ function EditorPage() {
               const next = { ...(presentationQ.data as Presentation), title: e.target.value };
               qc.setQueryData(["presentation", id], next);
             }}
-            className="max-w-md border-0 bg-transparent text-base font-medium focus-visible:ring-0"
+            className="max-w-md border-0 bg-transparent text-base font-semibold tracking-tight focus-visible:ring-0 px-0 h-auto"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={saveAll} disabled={saving} className="rounded-full">
-            {saving ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Save className="mr-1 h-3.5 w-3.5" />}
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" onClick={saveAll} disabled={saving} className="rounded-md font-medium">
+            {saving ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Save className="mr-1.5 h-3.5 w-3.5" />}
             Save
           </Button>
-          <Button size="sm" onClick={startPresentation} disabled={starting} className="rounded-full">
-            {starting ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1 h-3.5 w-3.5" />}
+          <Button size="sm" onClick={startPresentation} disabled={starting} className="rounded-md font-medium">
+            {starting ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1.5 h-3.5 w-3.5" />}
             Present
           </Button>
         </div>
@@ -245,35 +245,35 @@ function EditorPage() {
 
       <div className="grid flex-1 grid-cols-1 md:grid-cols-[260px_1fr_360px]">
         {/* Slides sidebar */}
-        <aside className="border-r border-white/5 bg-white/[0.01] p-3">
-          <div className="mb-2 flex items-center justify-between px-1">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground">Slides</span>
-            <Button size="icon" variant="ghost" onClick={addSlide} className="h-7 w-7">
+        <aside className="border-r border-border bg-muted/20 p-4">
+          <div className="mb-4 flex items-center justify-between px-1">
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Slides</span>
+            <Button size="icon" variant="ghost" onClick={addSlide} className="h-7 w-7 rounded-md">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {slides.map((s, i) => (
               <div
                 key={s.id}
-                className={`group cursor-pointer rounded-xl border px-3 py-2 text-sm transition ${
-                  selectedSlideId === s.id ? "border-primary/60 bg-primary/10" : "border-transparent bg-white/[0.02] hover:bg-white/[0.04]"
+                className={`group cursor-pointer rounded-lg border px-3 py-2.5 text-sm transition-all ${
+                  selectedSlideId === s.id ? "border-border bg-card shadow-sm" : "border-transparent bg-muted/40 hover:bg-muted"
                 }`}
                 onClick={() => setSelectedSlideId(s.id)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-mono text-xs font-medium text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
                   <div className="flex items-center gap-0.5 opacity-0 transition group-hover:opacity-100">
-                    <button className="rounded p-1 hover:bg-white/10" onClick={(e) => { e.stopPropagation(); move(s.id, -1); }}><ChevronUp className="h-3 w-3" /></button>
-                    <button className="rounded p-1 hover:bg-white/10" onClick={(e) => { e.stopPropagation(); move(s.id, 1); }}><ChevronDown className="h-3 w-3" /></button>
-                    <button className="rounded p-1 hover:bg-white/10" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3" /></button>
-                    <button className="rounded p-1 hover:bg-white/10 text-destructive" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
+                    <button className="rounded-md p-1 hover:bg-background border border-transparent hover:border-border hover:shadow-sm transition-all" onClick={(e) => { e.stopPropagation(); move(s.id, -1); }}><ChevronUp className="h-3 w-3 text-muted-foreground" /></button>
+                    <button className="rounded-md p-1 hover:bg-background border border-transparent hover:border-border hover:shadow-sm transition-all" onClick={(e) => { e.stopPropagation(); move(s.id, 1); }}><ChevronDown className="h-3 w-3 text-muted-foreground" /></button>
+                    <button className="rounded-md p-1 hover:bg-background border border-transparent hover:border-border hover:shadow-sm transition-all" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3 text-muted-foreground" /></button>
+                    <button className="rounded-md p-1 hover:bg-destructive/10 border border-transparent hover:border-destructive/20 transition-all text-destructive" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
                   </div>
                 </div>
-                <p className="mt-1 truncate text-xs">
+                <p className="mt-1.5 truncate text-xs font-medium">
                   {s.question || <span className="text-muted-foreground italic">Untitled</span>}
                 </p>
-                <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {SLIDE_TYPE_LABELS[s.type]}
                 </p>
               </div>
@@ -286,33 +286,33 @@ function EditorPage() {
           {selectedSlide ? (
             <motion.div
               key={selectedSlide.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="mx-auto max-w-2xl"
             >
               <SlideEditor slide={selectedSlide} onChange={patchSlideLocal} />
             </motion.div>
           ) : (
-            <div className="text-center text-muted-foreground">Select a slide</div>
+            <div className="text-center text-sm font-medium text-muted-foreground mt-20">Select a slide</div>
           )}
         </main>
 
         {/* Right panel */}
-        <aside className="border-l border-white/5 bg-white/[0.01] p-4">
-          <div className="space-y-6">
+        <aside className="border-l border-border bg-muted/20 p-5">
+          <div className="space-y-8">
             <div>
-              <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Slide type</p>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Slide type</p>
               {selectedSlide && (
                 <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
               )}
             </div>
             <div>
-              <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Live preview</p>
-              <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live preview</p>
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
                 {selectedSlide ? (
                   <>
-                    <h4 className="text-sm font-semibold">{selectedSlide.question || "Your question"}</h4>
-                    <div className="mt-3">
+                    <h4 className="text-sm font-semibold tracking-tight">{selectedSlide.question || "Your question"}</h4>
+                    <div className="mt-4">
                       <ResultsView slide={selectedSlide} votes={[]} compact />
                     </div>
                   </>

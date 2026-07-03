@@ -14,16 +14,16 @@ import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
-    <div className="mesh-bg flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Error 404</p>
-        <h1 className="mt-3 text-4xl font-semibold">Nothing here</h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Error 404</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight">Nothing here</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist.
         </p>
         <a
           href="/"
-          className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          className="mt-6 inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 shadow-sm"
         >
           Back home
         </a>
@@ -38,10 +38,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     console.error("Root boundary error caught:", error);
   }, [error]);
   return (
-    <div className="mesh-bg flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold">Something broke</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="text-2xl font-semibold tracking-tight">Something broke</h1>
+        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
           {error?.message ?? "An unexpected error occurred."}
         </p>
         <button
@@ -49,7 +49,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             router.invalidate();
             reset();
           }}
-          className="mt-6 inline-flex items-center rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground"
+          className="mt-6 inline-flex items-center rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
         >
           Try again
         </button>
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>

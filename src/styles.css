@@ -1,4 +1,4 @@
-@import "tailwindcss" source(none);
+@import "tailwindcss";
 @source "../src";
 @import "tw-animate-css";
 @import "@fontsource-variable/geist";
@@ -6,14 +6,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --font-sans: "Inter", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -33,56 +33,51 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Dark by default. */
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.16 0.015 265);
-  --foreground: oklch(0.98 0.005 265);
-  --card: oklch(0.20 0.018 265);
-  --card-foreground: oklch(0.98 0.005 265);
-  --popover: oklch(0.19 0.02 265);
-  --popover-foreground: oklch(0.98 0.005 265);
-  --primary: oklch(0.72 0.22 300);
-  --primary-foreground: oklch(0.16 0.015 265);
-  --secondary: oklch(0.25 0.02 265);
-  --secondary-foreground: oklch(0.98 0.005 265);
-  --muted: oklch(0.24 0.018 265);
-  --muted-foreground: oklch(0.70 0.02 265);
-  --accent: oklch(0.30 0.05 300);
-  --accent-foreground: oklch(0.98 0.005 265);
-  --destructive: oklch(0.65 0.24 22);
-  --destructive-foreground: oklch(0.98 0.005 265);
-  --border: oklch(1 0 0 / 8%);
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.72 0.22 300);
-  --chart-1: oklch(0.72 0.22 300);
-  --chart-2: oklch(0.72 0.19 200);
-  --chart-3: oklch(0.75 0.18 145);
-  --chart-4: oklch(0.80 0.19 60);
-  --chart-5: oklch(0.72 0.22 20);
-  --sidebar: oklch(0.18 0.017 265);
-  --sidebar-foreground: oklch(0.98 0.005 265);
-  --sidebar-primary: oklch(0.72 0.22 300);
-  --sidebar-primary-foreground: oklch(0.16 0.015 265);
-  --sidebar-accent: oklch(0.25 0.02 265);
-  --sidebar-accent-foreground: oklch(0.98 0.005 265);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.72 0.22 300);
+  --radius: 8px;
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #111827;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #111827;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #111827;
+}
+
+.dark {
+  --background: #0f1115;
+  --foreground: #f9fafb;
+  --card: #14171c;
+  --card-foreground: #f9fafb;
+  --popover: #14171c;
+  --popover-foreground: #f9fafb;
+  --primary: #f9fafb;
+  --primary-foreground: #111827;
+  --secondary: #1f2937;
+  --secondary-foreground: #f9fafb;
+  --muted: #1f2937;
+  --muted-foreground: #9ca3af;
+  --accent: #1f2937;
+  --accent-foreground: #f9fafb;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #f9fafb;
+  --border: #374151;
+  --input: #374151;
+  --ring: #f9fafb;
 }
 
 @layer base {
@@ -92,23 +87,19 @@
 }
 
 @utility glass {
-  background: color-mix(in oklab, var(--card) 60%, transparent);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid color-mix(in oklab, white 8%, transparent);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 }
 
 @utility mesh-bg {
-  background:
-    radial-gradient(60% 50% at 15% 10%, oklch(0.72 0.22 300 / 0.20), transparent 60%),
-    radial-gradient(50% 50% at 85% 20%, oklch(0.72 0.19 220 / 0.18), transparent 60%),
-    radial-gradient(60% 40% at 50% 100%, oklch(0.72 0.22 340 / 0.15), transparent 70%),
-    var(--color-background);
+  background-color: var(--color-background);
 }
 
 @utility grid-bg {
   background-image:
-    linear-gradient(to right, color-mix(in oklab, white 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, white 5%, transparent) 1px, transparent 1px);
-  background-size: 44px 44px;
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.5;
 }

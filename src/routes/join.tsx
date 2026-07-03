@@ -48,33 +48,33 @@ function JoinPage() {
   }
 
   return (
-    <div className="mesh-bg flex min-h-screen items-center justify-center px-6 py-10">
-      <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back home
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
+      <div className="w-full max-w-[400px]">
+        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-4 w-4" /> Back to home
         </Link>
         <motion.form
           onSubmit={submit}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-3xl p-8"
+          className="rounded-xl border border-border bg-card p-8 shadow-sm"
         >
-          <div className="mb-6 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-500">
-              <Radio className="h-4 w-4 text-white" />
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Radio className="h-4 w-4" strokeWidth={2.5} />
             </div>
-            <h1 className="text-xl font-semibold">Join a session</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Join a session</h1>
           </div>
-          <p className="text-sm text-muted-foreground">Enter the code shown on the presenter's screen.</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">Enter the 6-character code shown on the presenter's screen.</p>
           <Input
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             maxLength={8}
             placeholder="ABC123"
-            className="mt-6 text-center font-mono text-3xl tracking-[0.4em] uppercase h-16"
+            className="mt-6 text-center font-mono text-3xl tracking-[0.3em] uppercase h-16 rounded-md bg-muted/50 border-border"
             autoFocus
           />
-          <Button type="submit" disabled={loading || code.length < 4} className="mt-4 w-full rounded-full">
+          <Button type="submit" disabled={loading || code.length < 4} className="mt-4 w-full rounded-md font-medium h-11">
             {loading ? "…" : "Join"}
           </Button>
         </motion.form>

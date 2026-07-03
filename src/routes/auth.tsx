@@ -78,66 +78,66 @@ function AuthPage() {
   }
 
   return (
-    <div className="mesh-bg flex min-h-screen items-center justify-center px-6 py-10">
-      <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back home
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
+      <div className="w-full max-w-[400px]">
+        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-4 w-4" /> Back to home
         </Link>
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-3xl p-8"
+          className="rounded-xl border border-border bg-card p-8 shadow-sm"
         >
-          <div className="mb-6 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-500">
-              <Radio className="h-4 w-4 text-white" />
+          <div className="mb-8 flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Radio className="h-4 w-4" strokeWidth={2.5} />
             </div>
-            <h1 className="text-xl font-semibold">
-              {mode === "signin" ? "Welcome back" : "Create your account"}
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {mode === "signin" ? "Welcome back" : "Create an account"}
             </h1>
           </div>
 
           <Button
             type="button"
             variant="outline"
-            className="w-full rounded-full"
+            className="w-full rounded-md font-medium"
             onClick={signInGoogle}
           >
             <GoogleIcon /> Continue with Google
           </Button>
 
-          <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-            <div className="h-px flex-1 bg-white/10" /> or <div className="h-px flex-1 bg-white/10" />
+          <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
           </div>
 
           <form onSubmit={submit} className="space-y-4">
             {mode === "signup" && (
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} className="mt-1" />
+              <div className="space-y-1">
+                <Label htmlFor="name" className="text-xs font-semibold uppercase text-muted-foreground">Name</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} className="h-10 rounded-md" />
               </div>
             )}
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1" />
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-xs font-semibold uppercase text-muted-foreground">Email</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-10 rounded-md" />
             </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="mt-1" />
+            <div className="space-y-1">
+              <Label htmlFor="password" className="text-xs font-semibold uppercase text-muted-foreground">Password</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-10 rounded-md" />
             </div>
-            <Button type="submit" disabled={loading} className="w-full rounded-full">
+            <Button type="submit" disabled={loading} className="w-full rounded-md font-medium mt-2 h-10">
               {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "New to Pollaris?" : "Already have an account?"}{" "}
             <button
-              className="font-medium text-foreground underline-offset-4 hover:underline"
+              className="font-medium text-foreground hover:underline"
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
               type="button"
             >
-              {mode === "signin" ? "Create account" : "Sign in"}
+              {mode === "signin" ? "Sign up" : "Log in"}
             </button>
           </p>
         </motion.div>

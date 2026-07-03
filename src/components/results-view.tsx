@@ -28,10 +28,10 @@ function MCResults({ slide, votes, compact }: Props) {
           <motion.div
             layout
             key={c.id}
-            className="relative overflow-hidden rounded-xl bg-white/[0.04] px-4 py-3"
+            className="relative overflow-hidden rounded-md border border-border bg-card px-4 py-3 shadow-sm"
           >
             <motion.div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-fuchsia-500/40 to-violet-500/40"
+              className="absolute inset-y-0 left-0 bg-primary/10"
               initial={{ width: 0 }}
               animate={{ width: `${barPct}%` }}
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
@@ -68,9 +68,9 @@ function WordCloudResults({ votes, compact }: { votes: Vote[]; compact?: boolean
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               style={{ fontSize: `${scale}rem` }}
-              className="font-semibold tracking-tight"
+              className="font-semibold tracking-tight text-foreground"
             >
-              <span className="bg-gradient-to-r from-fuchsia-300 to-violet-300 bg-clip-text text-transparent">
+              <span>
                 {w.word}
               </span>
             </motion.span>
@@ -89,7 +89,7 @@ function RatingResults({ votes, compact }: { votes: Vote[]; compact?: boolean })
         key={avg}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className={`font-semibold ${compact ? "text-4xl" : "text-7xl"} bg-gradient-to-r from-fuchsia-300 to-violet-300 bg-clip-text text-transparent`}
+        className={`font-semibold tracking-tight text-foreground ${compact ? "text-4xl" : "text-7xl"}`}
       >
         {avg.toFixed(1)}
       </motion.div>
@@ -97,7 +97,8 @@ function RatingResults({ votes, compact }: { votes: Vote[]; compact?: boolean })
         {[1, 2, 3, 4, 5].map((i) => (
           <Star
             key={i}
-            className={`${compact ? "h-4 w-4" : "h-6 w-6"} ${i <= Math.round(avg) ? "fill-fuchsia-400 text-fuchsia-400" : "text-white/20"}`}
+            className={`${compact ? "h-4 w-4" : "h-6 w-6"} ${i <= Math.round(avg) ? "fill-primary text-primary" : "text-muted-foreground/30 fill-transparent"}`}
+            strokeWidth={1.5}
           />
         ))}
       </div>
@@ -120,7 +121,7 @@ function OpenTextResults({ votes, compact }: { votes: Vote[]; compact?: boolean 
             layout
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm"
+            className="rounded-md border border-border bg-card px-4 py-3 text-sm shadow-sm"
           >
             {v.text}
           </motion.div>

@@ -64,48 +64,50 @@ function Dashboard() {
   });
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10">
+    <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Your studio</p>
-          <h1 className="mt-1 text-4xl font-semibold tracking-tight">Presentations</h1>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Workspace</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Presentations</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Build a deck, share a code, watch answers land live.
           </p>
         </div>
-        <Button size="lg" className="rounded-full" disabled={create.isPending} onClick={() => create.mutate()}>
+        <Button size="lg" className="rounded-md font-medium px-6 h-11" disabled={create.isPending} onClick={() => create.mutate()}>
           {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           New presentation
         </Button>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-12">
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-40 animate-pulse rounded-2xl bg-white/[0.04]" />
+              <div key={i} className="h-44 animate-pulse rounded-xl border border-border bg-muted/50" />
             ))}
           </div>
         ) : presentations && presentations.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {presentations.map((p, i) => (
               <motion.div
                 key={p.id}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
                 <Link to="/editor/$id" params={{ id: p.id }}>
-                  <Card className="group h-full cursor-pointer overflow-hidden rounded-2xl border-white/5 bg-white/[0.02] p-6 transition hover:border-white/15 hover:bg-white/[0.04]">
+                  <Card className="group h-full cursor-pointer overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-border/80">
                     <div className="flex items-start justify-between">
-                      <Presentation className="h-6 w-6 text-primary" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/5">
+                        <Presentation className="h-5 w-5 text-primary" />
+                      </div>
                       <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
                     </div>
-                    <h3 className="mt-6 truncate text-lg font-semibold">{p.title}</h3>
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                    <h3 className="mt-5 truncate text-lg font-semibold tracking-tight">{p.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground leading-relaxed">
                       {p.description ?? "No description yet."}
                     </p>
-                    <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="mt-6 flex items-center gap-2 text-xs font-medium text-muted-foreground">
                       <Calendar className="h-3.5 w-3.5" />
                       Updated {formatDistanceToNowStrict(new Date(p.updated_at))} ago
                     </div>
@@ -115,11 +117,13 @@ function Dashboard() {
             ))}
           </div>
         ) : (
-          <div className="glass rounded-3xl p-12 text-center">
-            <Presentation className="mx-auto h-10 w-10 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">No presentations yet</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Create your first one — it takes seconds.</p>
-            <Button className="mt-6 rounded-full" onClick={() => create.mutate()}>
+          <div className="rounded-xl border border-border bg-card p-16 text-center shadow-sm">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-muted mb-4">
+              <Presentation className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold tracking-tight">No presentations yet</h3>
+            <p className="mt-2 text-sm text-muted-foreground">Create your first one — it takes seconds.</p>
+            <Button className="mt-6 rounded-md font-medium" onClick={() => create.mutate()}>
               <Plus className="mr-2 h-4 w-4" /> New presentation
             </Button>
           </div>

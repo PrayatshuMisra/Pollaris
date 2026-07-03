@@ -29,28 +29,28 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <div className="mesh-bg min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-background/60 backdrop-blur-xl">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-fuchsia-500 to-indigo-500">
-              <Radio className="h-3.5 w-3.5 text-white" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Radio className="h-3.5 w-3.5" strokeWidth={2.5} />
             </div>
-            <span className="text-sm font-semibold">Pollaris</span>
+            <span className="text-sm font-semibold tracking-tight">Pollaris</span>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
-            <Link to="/dashboard" activeProps={{ className: "bg-white/5" }} className="rounded-full px-4 py-1.5 text-sm text-muted-foreground hover:text-foreground">
-              <LayoutDashboard className="mr-1 inline h-3.5 w-3.5" /> Dashboard
+            <Link to="/dashboard" activeProps={{ className: "bg-muted text-foreground" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              <LayoutDashboard className="mr-1.5 inline h-3.5 w-3.5" /> Dashboard
             </Link>
           </nav>
           <div className="flex items-center gap-3">
             {user?.email && (
-              <span className="hidden text-xs text-muted-foreground md:inline-flex items-center gap-1">
+              <span className="hidden text-xs font-medium text-muted-foreground md:inline-flex items-center gap-1.5">
                 <UserIcon className="h-3.5 w-3.5" /> {user.email}
               </span>
             )}
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="mr-1 h-4 w-4" /> Sign out
+            <Button variant="ghost" size="sm" onClick={signOut} className="font-medium rounded-md">
+              <LogOut className="mr-1.5 h-4 w-4" /> Sign out
             </Button>
           </div>
         </div>
