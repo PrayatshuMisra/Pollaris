@@ -25,24 +25,31 @@ function MCResults({ slide, votes, compact }: Props) {
         const pct = total === 0 ? 0 : Math.round((c.count / total) * 100);
         const barPct = (c.count / max) * 100;
         return (
-          <motion.div
-            layout
-            key={c.id}
-            className="relative overflow-hidden rounded-md border border-border bg-card px-4 py-3 shadow-sm"
-          >
             <motion.div
-              className="absolute inset-y-0 left-0 bg-primary/10"
-              initial={{ width: 0 }}
-              animate={{ width: `${barPct}%` }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
-            />
-            <div className="relative flex items-center justify-between">
-              <span className={compact ? "text-sm" : "text-base"}>{c.label || "—"}</span>
-              <span className="font-mono text-sm text-muted-foreground">
-                {c.count} · {pct}%
-              </span>
-            </div>
-          </motion.div>
+              layout
+              key={c.id}
+              className="relative overflow-hidden rounded-xl border border-white/60 glass-panel px-4 py-3 shadow-md"
+            >
+              <motion.div
+                className="absolute inset-y-0 left-0 bg-blue-500/20"
+                initial={{ width: 0 }}
+                animate={{ width: `${barPct}%` }}
+                transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              />
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {c.image_url && (
+                    <img src={c.image_url} alt={c.label} className="w-12 h-12 object-cover rounded shadow-sm border border-white/50" />
+                  )}
+                  <span className={compact ? "text-sm font-bold text-gray-900 drop-shadow-sm" : "text-base font-bold text-gray-900 drop-shadow-sm"}>
+                    {c.label || "—"}
+                  </span>
+                </div>
+                <span className="font-mono text-sm font-bold text-gray-700">
+                  {c.count} · {pct}%
+                </span>
+              </div>
+            </motion.div>
         );
       })}
     </div>

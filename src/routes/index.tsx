@@ -281,23 +281,34 @@ function Features() {
 
 function HowItWorks() {
   const steps = [
-    { n: "01", t: "Build slides", d: "Compose your presentation. Pick a poll type per slide, write the question, done.", color: "text-blue-600", bg: "bg-blue-50" },
-    { n: "02", t: "Share the code", d: "Present. A join code and QR appear. Audience scans or types to join.", color: "text-orange-500", bg: "bg-orange-50" },
-    { n: "03", t: "Watch it happen", d: "Every vote animates in. Advance slides — everyone follows automatically.", color: "text-green-600", bg: "bg-green-50" },
+    { n: "1", t: "Build slides", d: "Compose your presentation. Pick a poll type per slide, write the question, and customize the look.", icon: Cloud },
+    { n: "2", t: "Share the code", d: "Start presenting. A join code and QR appear automatically. Your audience scans or types to join.", icon: Users },
+    { n: "3", t: "Watch it happen", d: "Every vote animates in. As you advance slides, everyone's screen follows you automatically.", icon: BarChart3 },
   ];
   return (
-    <section id="how" className="border-t border-gray-100 bg-gray-50/50">
+    <section id="how" className="border-t border-neutral-100 bg-neutral-50/50">
       <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-        <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-widest text-red-500">How it works</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl text-black">Three steps. Live audience.</h2>
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-neutral-900">Three steps. Live audience.</h2>
+          <p className="mt-4 text-lg text-neutral-600">You focus on the presentation. We'll handle the engagement.</p>
         </div>
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
-          {steps.map((s) => (
-            <div key={s.n} className="rounded-lg bg-white border border-gray-100 p-6 md:p-8 shadow-sm">
-              <div className={`inline-flex items-center justify-center rounded px-2 py-1 font-mono text-xs font-bold ${s.color} ${s.bg}`}>{s.n}</div>
-              <h3 className="mt-5 text-lg font-bold tracking-tight text-black">{s.t}</h3>
-              <p className="mt-2 text-sm text-gray-600 font-medium leading-relaxed">{s.d}</p>
+        
+        <div className="grid gap-8 md:grid-cols-3 relative">
+          {/* Connector Line for Desktop */}
+          <div className="hidden md:block absolute top-12 left-24 right-24 h-[1px] bg-neutral-200 z-0" />
+          
+          {steps.map((s, i) => (
+            <div key={s.n} className="relative z-10 flex flex-col items-center text-center">
+              <div className="h-24 w-24 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center mb-6">
+                <div className="h-16 w-16 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400">
+                  <s.icon className="h-8 w-8" strokeWidth={1.5} />
+                </div>
+              </div>
+              <div className="inline-flex items-center justify-center rounded-full bg-neutral-900 text-white w-6 h-6 text-xs font-bold mb-4">
+                {s.n}
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-neutral-900 mb-2">{s.t}</h3>
+              <p className="text-base text-neutral-600 leading-relaxed max-w-[280px]">{s.d}</p>
             </div>
           ))}
         </div>
@@ -310,9 +321,6 @@ function CTA() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-24 md:py-32">
       <div className="rounded-2xl bg-black p-12 text-center md:p-20 text-white shadow-xl relative overflow-hidden">
-        {/* Subtle background glow effect */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/20 blur-3xl rounded-full pointer-events-none" />
-        
         <div className="relative z-10">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Your next presentation shouldn't be a monologue.</h2>
           <p className="mx-auto mt-4 max-w-xl text-gray-300 text-base font-medium">Start free. No credit card, no wait list.</p>

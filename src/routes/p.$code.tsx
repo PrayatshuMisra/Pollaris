@@ -282,17 +282,22 @@ function MCResponder({
   onSubmit: (v: Record<string, unknown>) => void;
   submitting: boolean;
 }) {
-  const choices = (slide.config as { choices?: { id: string; label: string }[] })?.choices ?? [];
+  const choices = (slide.config as { choices?: { id: string; label: string; image_url?: string }[] })?.choices ?? [];
   return (
-    <div className="space-y-3">
+    <div className="grid gap-3 sm:grid-cols-2">
       {choices.map((c) => (
         <button
           key={c.id}
           disabled={submitting}
           onClick={() => onSubmit({ choice_id: c.id })}
-          className="w-full rounded-lg border border-border bg-muted/30 px-5 py-4 text-left text-base font-medium transition-colors hover:border-primary/50 hover:bg-muted shadow-sm disabled:opacity-50"
+          className="group relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-white/60 glass-panel bg-white/40 p-5 text-center transition-all hover:bg-white/60 hover:border-blue-400 hover:shadow-md disabled:opacity-50 min-h-[5rem]"
         >
-          {c.label || "—"}
+          {c.image_url && (
+            <div className="mb-3 w-full flex items-center justify-center">
+              <img src={c.image_url} alt={c.label} className="max-h-32 rounded-lg object-cover shadow-sm transition-transform group-hover:scale-105 border border-white/50" />
+            </div>
+          )}
+          <span className="text-base font-bold text-gray-900 drop-shadow-sm">{c.label || "—"}</span>
         </button>
       ))}
     </div>

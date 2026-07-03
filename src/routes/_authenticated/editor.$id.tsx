@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import type { Slide, Presentation, SlideType } from "@/lib/types";
@@ -61,34 +61,52 @@ function EditorPage() {
 
   const selectedSlide = slides.find((s) => s.id === selectedSlideId) ?? null;
 
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const patchSlideLocal = useCallback(
     (patch: Partial<Slide>) => {
       if (!selectedSlide) return;
+      
+      const newSlide = { ...selectedSlide, ...patch };
+      
+      // 1. Optimistic UI update
       qc.setQueryData<Slide[]>(["slides", id], (prev) =>
-        (prev ?? []).map((s) => (s.id === selectedSlide.id ? { ...s, ...patch } : s)),
+        (prev ?? []).map((s) => (s.id === selectedSlide.id ? newSlide : s)),
       );
+
+      // 2. Debounced Background Auto-save
+      setSaving(true);
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      
+      saveTimeoutRef.current = setTimeout(async () => {
+        try {
+          const { error } = await supabase
+            .from("slides")
+            .update({
+              question: newSlide.question,
+              description: newSlide.description,
+              type: newSlide.type,
+              config: newSlide.config as never,
+              order_index: newSlide.order_index,
+            })
+            .eq("id", newSlide.id);
+          
+          if (error) throw error;
+        } catch (e) {
+          console.error("Auto-save failed:", e);
+          toast.error("Failed to auto-save changes");
+        } finally {
+          setSaving(false);
+        }
+      }, 750); // 750ms debounce
     },
     [qc, id, selectedSlide],
   );
 
+  // Manual save for presentation title/metadata if needed, though auto-save handles slides
   async function saveAll() {
     setSaving(true);
     try {
-      const current = qc.getQueryData<Slide[]>(["slides", id]) ?? [];
-      for (const s of current) {
-        const { error } = await supabase
-          .from("slides")
-          .update({
-            question: s.question,
-            description: s.description,
-            type: s.type,
-            config: s.config as never,
-            order_index: s.order_index,
-          })
-          .eq("id", s.id);
-        if (error) throw error;
-      }
-      // save presentation title
       const p = presentationQ.data;
       if (p) {
         await supabase.from("presentations").update({ title: p.title, description: p.description }).eq("id", p.id);
@@ -244,38 +262,40 @@ function EditorPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden flex-col lg:flex-row relative">
         {/* Left Sidebar - Slides List */}
-        <aside className="w-[240px] flex-shrink-0 border-r border-white/50 glass flex flex-col overflow-hidden shadow-xl z-10">
-          <div className="p-4 border-b border-white/40">
-            <Button onClick={addSlide} className="w-full rounded glass border border-white/60 hover:bg-white/60 text-gray-900 shadow-sm font-bold h-10 transition-colors">
+        <aside className="w-full lg:w-[240px] flex-shrink-0 border-r border-white/50 glass flex flex-col overflow-hidden shadow-xl z-20 h-48 lg:h-auto border-b lg:border-b-0">
+          <div className="p-3 lg:p-4 border-b border-white/40">
+            <Button onClick={addSlide} className="w-full rounded glass border border-white/60 hover:bg-white/60 text-gray-900 shadow-sm font-bold h-9 lg:h-10 transition-colors text-sm">
               <Plus className="mr-2 h-4 w-4" /> New slide
             </Button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 flex lg:flex-col gap-3 lg:gap-0">
             {slides.map((s, i) => (
               <div
                 key={s.id}
-                className={`group flex items-start gap-3 cursor-pointer p-1 -mx-1 rounded transition-colors ${
-                  selectedSlideId === s.id ? "bg-white/40" : "hover:bg-white/20"
+                className={`group flex lg:items-start items-center gap-3 cursor-pointer p-1.5 lg:-mx-1 rounded-lg transition-colors flex-shrink-0 w-48 lg:w-auto ${
+                  selectedSlideId === s.id ? "bg-white/40 shadow-sm" : "hover:bg-white/20"
                 }`}
                 onClick={() => setSelectedSlideId(s.id)}
               >
-                <div className="font-bold text-gray-700 text-[11px] pt-1 w-4 text-center">{i + 1}</div>
-                <div className={`flex-1 rounded-md border-2 transition-all overflow-hidden ${selectedSlideId === s.id ? 'border-blue-500 shadow-md bg-white/50' : 'border-white/40 hover:border-white/60 bg-white/20'}`}>
+                <div className="font-bold text-gray-700 text-xs lg:pt-1 w-4 text-center">{i + 1}</div>
+                <div className={`flex-1 rounded-md border-2 transition-all overflow-hidden bg-white/40 backdrop-blur-md ${selectedSlideId === s.id ? 'border-blue-500 shadow-md' : 'border-white/50 hover:border-white/80'}`}>
                   {/* Thumbnail Preview */}
-                  <div className="aspect-[4/3] bg-white/30 flex flex-col items-center justify-center p-2 relative backdrop-blur-sm">
-                    <span className="text-gray-900/20 text-4xl font-black opacity-30">{i + 1}</span>
+                  <div className="aspect-[4/3] flex flex-col items-center justify-center p-3 relative">
+                    <p className="text-[10px] font-bold text-gray-800 text-center line-clamp-2 leading-tight">
+                      {s.question || "Untitled"}
+                    </p>
                     
                     {/* Hover Actions */}
-                    <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="rounded glass border border-white/60 p-1 shadow-sm hover:bg-white/80 text-gray-800 transition-colors" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3" /></button>
-                      <button className="rounded glass border border-white/60 p-1 shadow-sm hover:bg-red-100 hover:border-red-300 text-red-600 transition-colors" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
+                    <div className="absolute top-1 right-1 flex-col gap-1 hidden lg:group-hover:flex transition-opacity bg-white/20 p-0.5 rounded backdrop-blur-md border border-white/40">
+                      <button className="rounded hover:bg-white/80 text-gray-800 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3" /></button>
+                      <button className="rounded hover:bg-red-100 text-red-600 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
                     </div>
                   </div>
                   {/* Label */}
-                  <div className="bg-white/40 border-t border-white/50 py-1.5 px-2">
-                    <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wide truncate">
+                  <div className="bg-white/60 border-t border-white/50 py-1 px-2">
+                    <p className="text-[9px] font-black text-gray-700 uppercase tracking-wider truncate">
                       {SLIDE_TYPE_LABELS[s.type]}
                     </p>
                   </div>
@@ -286,14 +306,14 @@ function EditorPage() {
         </aside>
 
         {/* Center Canvas */}
-        <main className="flex-1 bg-transparent overflow-auto flex items-center justify-center p-4 md:p-8 relative">
+        <main className="flex-1 bg-transparent overflow-auto flex items-center justify-center p-4 sm:p-6 lg:p-8 relative min-h-[400px]">
           {selectedSlide ? (
             <motion.div
               key={selectedSlide.id}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2 }}
-              className="glass-panel rounded-xl shadow-2xl border border-white/80 p-6 md:p-12 flex flex-col overflow-hidden"
+              className="glass-panel rounded-2xl shadow-2xl border border-white/80 p-6 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
               style={{
                 aspectRatio: "16/9",
                 width: "100%",
@@ -309,15 +329,15 @@ function EditorPage() {
         </main>
 
         {/* Right Sidebar - Configuration */}
-        <aside className="w-[340px] flex-shrink-0 border-l border-white/50 glass flex flex-col overflow-hidden shadow-xl z-10">
-          <div className="flex items-center gap-4 px-6 py-4 border-b border-white/40 bg-white/20">
+        <aside className="w-full lg:w-[320px] xl:w-[360px] flex-shrink-0 border-l border-white/50 glass flex flex-col overflow-hidden shadow-xl z-20 h-64 lg:h-auto border-t lg:border-t-0">
+          <div className="flex items-center gap-6 px-6 py-4 border-b border-white/40 bg-white/20 shrink-0">
              <div className="font-bold text-sm text-gray-900 border-b-2 border-blue-600 pb-1 drop-shadow-sm">Content</div>
              <div className="font-bold text-sm text-gray-500 hover:text-gray-800 pb-1 cursor-pointer transition-colors">Design</div>
           </div>
-          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+          <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-8">
             {/* Slide Type Selection */}
             <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
+              <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
               {selectedSlide && (
                 <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
               )}
@@ -325,10 +345,10 @@ function EditorPage() {
             
             {/* Settings */}
             <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Settings</p>
-              <div className="rounded-lg border border-white/60 glass p-4 shadow-sm flex items-center gap-3">
-                 <Settings className="h-5 w-5 text-gray-700" />
-                 <span className="text-sm font-bold text-gray-900">Advanced settings available during presentation.</span>
+              <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Settings</p>
+              <div className="rounded-xl border border-white/60 glass-panel p-4 shadow-sm flex items-start gap-3">
+                 <Settings className="h-5 w-5 text-gray-700 mt-0.5 shrink-0" />
+                 <span className="text-sm font-bold text-gray-900 leading-snug">Advanced settings available during presentation.</span>
               </div>
             </div>
           </div>

@@ -1,14 +1,15 @@
 import type { Slide, SlideType, Vote } from "./types";
 
 export interface MCTally {
-  choices: { id: string; label: string; count: number }[];
+  choices: { id: string; label: string; count: number; image_url?: string }[];
   total: number;
 }
 
 export function tallyMultipleChoice(slide: Slide, votes: Vote[]): MCTally {
-  const choices = ((slide.config as { choices?: { id: string; label: string }[] })?.choices ?? []).map((c) => ({
+  const choices = ((slide.config as { choices?: { id: string; label: string; image_url?: string }[] })?.choices ?? []).map((c) => ({
     id: c.id,
     label: c.label,
+    image_url: c.image_url,
     count: 0,
   }));
   for (const v of votes) {
