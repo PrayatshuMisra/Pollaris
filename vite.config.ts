@@ -4,8 +4,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import path from "path";
+import { nitro } from "nitro/vite";
 
-export default defineConfig(async ({ command }) => {
+export default defineConfig(({ command }) => {
   const plugins = [
     tsconfigPaths({ projects: ["./tsconfig.json"] }),
     tailwindcss(),
@@ -23,16 +24,11 @@ export default defineConfig(async ({ command }) => {
   ];
 
   if (command === "build") {
-    try {
-      const nitroMod = await import("nitro/vite");
-      if (nitroMod && nitroMod.nitro) {
-        plugins.push(nitroMod.nitro({
-          defaultPreset: "cloudflare-module",
-        }));
-      }
-    } catch (e) {
-      console.warn("Could not load nitro/vite plugin:", e);
-    }
+    plugins.push(
+      nitro({
+        defaultPreset: "cloudflare-module",
+      })
+    );
   }
 
   return {
