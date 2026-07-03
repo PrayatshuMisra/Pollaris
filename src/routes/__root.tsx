@@ -63,13 +63,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Pollaris — Live polling that feels alive" },
+      { title: "Pollaris - Live polling that feels alive" },
       {
         name: "description",
         content:
           "Pollaris is a premium real-time polling & presentation platform. Design interactive slides, share a code, and watch responses arrive live.",
       },
-      { property: "og:title", content: "Pollaris — Live polling that feels alive" },
+      { property: "og:title", content: "Pollaris - Live polling that feels alive" },
       {
         property: "og:description",
         content: "Design interactive slides, share a code, and watch responses arrive live.",

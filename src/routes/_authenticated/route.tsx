@@ -36,8 +36,7 @@ function AuthenticatedLayout() {
         <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50">
           <div className="mx-auto flex items-center justify-between gap-4 px-6 py-3 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
             <Link to="/dashboard" className="flex items-center gap-2 text-gray-900 hover:opacity-80 transition-opacity pr-4">
-              <img src="/logo4.png" alt="Pollaris Logo" className="h-7 object-contain" />
-              <span className="text-xl font-black tracking-tight drop-shadow-sm text-gray-900">Pollaris</span>
+              <img src="/logo4.png" alt="Pollaris Logo" className="h-12 object-contain" />
             </Link>
             <nav className="hidden items-center gap-1 md:flex">
               <Link to="/dashboard" activeProps={{ className: "bg-white/40 shadow-sm" }} className="rounded-full px-4 py-2 text-sm font-bold text-gray-800 hover:bg-white/30 transition-colors">

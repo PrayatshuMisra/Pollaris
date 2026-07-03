@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/editor/$id")({
-  head: () => ({ meta: [{ title: "Editor — Pollaris" }] }),
+  head: () => ({ meta: [{ title: "Editor - Pollaris" }] }),
   component: EditorPage,
 });
 

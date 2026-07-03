@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/present/$id")({
-  head: () => ({ meta: [{ title: "Present — Pollaris" }] }),
+  head: () => ({ meta: [{ title: "Present - Pollaris" }] }),
   component: PresentPage,
 });
 

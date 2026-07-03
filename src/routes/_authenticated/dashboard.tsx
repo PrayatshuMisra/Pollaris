@@ -9,7 +9,7 @@ import type { Presentation as PresentationT } from "@/lib/types";
 import { formatDistanceToNowStrict } from "@/lib/format-time";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "My presentations — Pollaris" }] }),
+  head: () => ({ meta: [{ title: "My presentations - Pollaris" }] }),
   component: Dashboard,
 });
 

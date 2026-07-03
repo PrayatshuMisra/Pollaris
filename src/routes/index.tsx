@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, BarChart3, Cloud, PlayCircle, Users, Zap, CheckCircle2, Star, Vote, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,18 +8,18 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-function TypewriterLine({ 
-  text, 
-  className, 
-  startTyping, 
-  onComplete, 
-  showCursor 
-}: { 
-  text: string, 
-  className?: string, 
-  startTyping: boolean, 
-  onComplete?: () => void, 
-  showCursor: boolean 
+function TypewriterLine({
+  text,
+  className,
+  startTyping,
+  onComplete,
+  showCursor
+}: {
+  text: string,
+  className?: string,
+  startTyping: boolean,
+  onComplete?: () => void,
+  showCursor: boolean
 }) {
   const [charIndex, setCharIndex] = useState(0);
   const hasCompleted = useRef(false);
@@ -37,7 +37,7 @@ function TypewriterLine({
       // Slight pause before signaling completion to move to the next line
       timeout = setTimeout(() => {
         if (onComplete) onComplete();
-      }, 300); 
+      }, 300);
     }
 
     return () => clearTimeout(timeout);
@@ -117,38 +117,58 @@ function Logo() {
 function Hero() {
   const [typewriterStep, setTypewriterStep] = useState(0);
 
+  const [pollData, setPollData] = useState([
+    { l: 'Ease of use', p: 48, c: 'bg-blue-500' },
+    { l: 'Design', p: 28, c: 'bg-orange-400' },
+    { l: 'Performance', p: 15, c: 'bg-green-500' },
+    { l: 'Support', p: 9, c: 'bg-red-500' }
+  ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPollData(prev => {
+        const next = [...prev];
+        const idx = Math.floor(Math.random() * next.length);
+        next[idx] = { ...next[idx], p: next[idx].p + Math.floor(Math.random() * 5) + 1 };
+        const total = next.reduce((sum, item) => sum + item.p, 0);
+        return next.map(item => ({ ...item, p: Math.round((item.p / total) * 100) }));
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="relative px-6 pb-24 pt-12 md:pt-20 lg:pt-28 mx-auto max-w-6xl flex flex-col lg:flex-row items-center gap-16 lg:gap-12">
-      <div className="flex-1 max-w-2xl text-left">
+    <section className="relative px-6 pb-24 pt-23 md:pt-25 lg:pt-28 mx-auto max-w-6xl flex flex-col lg:flex-row items-center gap-16 lg:gap-12">
+      <div className="flex-1 max-w-2xl text-left relative z-20">
         <h1 className="text-5xl leading-[1.1] font-bold tracking-tight md:text-[5rem] flex flex-col gap-1">
-          <TypewriterLine 
-            text="Engage." 
-            className="text-blue-600" 
-            startTyping={true} 
-            onComplete={() => setTypewriterStep(1)} 
-            showCursor={typewriterStep === 0} 
+          <TypewriterLine
+            text="Engage."
+            className="text-blue-600"
+            startTyping={true}
+            onComplete={() => setTypewriterStep(1)}
+            showCursor={typewriterStep === 0}
           />
-          <TypewriterLine 
-            text="Poll." 
-            className="text-orange-500" 
-            startTyping={typewriterStep >= 1} 
-            onComplete={() => setTypewriterStep(2)} 
-            showCursor={typewriterStep === 1} 
+          <TypewriterLine
+            text="Poll."
+            className="text-orange-500"
+            startTyping={typewriterStep >= 1}
+            onComplete={() => setTypewriterStep(2)}
+            showCursor={typewriterStep === 1}
           />
-          <TypewriterLine 
-            text="Inspire." 
-            className="text-red-500" 
-            startTyping={typewriterStep >= 2} 
-            showCursor={typewriterStep >= 2} 
+          <TypewriterLine
+            text="Inspire."
+            className="text-red-500"
+            startTyping={typewriterStep >= 2}
+            showCursor={typewriterStep >= 2}
           />
         </h1>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.5 }}
           className="mt-6 max-w-md text-lg text-gray-800 leading-relaxed font-semibold"
         >
           Create interactive polls, engage your audience in real time, and turn every session into an unforgettable experience.
         </motion.p>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.0, duration: 0.5 }}
           className="mt-10 flex flex-wrap items-center gap-4"
         >
@@ -161,7 +181,7 @@ function Hero() {
             See How It Works <PlayCircle className="ml-2 h-4 w-4 text-green-600" />
           </Button>
         </motion.div>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.5 }}
           className="mt-12 flex flex-wrap items-center gap-6 text-sm font-bold text-gray-800"
         >
@@ -172,55 +192,75 @@ function Hero() {
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-        className="flex-1 w-full hidden lg:grid grid-cols-2 gap-4"
+        initial={{ opacity: 0, x: 20, rotateY: -15, rotateX: 10, scale: 0.9 }}
+        animate={{ opacity: 1, x: 0, rotateY: -20, rotateX: 15, scale: 1 }}
+        transition={{ duration: 1.2, delay: 0.5, type: "spring", bounce: 0.4 }}
+        style={{ perspective: "1000px", transformStyle: "preserve-3d" }}
+        className="flex-1 w-full hidden lg:grid grid-cols-2 gap-5 relative z-10"
       >
-        <div className="col-span-2 rounded-lg glass-panel p-6 shadow-sm border border-gray-100">
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+          style={{ transform: "translateZ(40px)" }}
+          className="col-span-2 rounded-2xl glass-panel p-6 shadow-2xl border border-white/60 bg-white/40"
+        >
           <div className="flex items-center justify-between mb-4">
-             <div className="inline-flex rounded-md bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700">Multiple Choice</div>
-             <span className="text-xs font-bold text-gray-500">Question 1</span>
+            <div className="inline-flex rounded-md bg-blue-100/50 px-2.5 py-1 text-xs font-bold text-blue-700 shadow-sm border border-blue-200">Multiple Choice</div>
+            <div className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-orange-500 animate-pulse" /><span className="text-xs font-bold text-gray-600 drop-shadow-sm">Live</span></div>
           </div>
-          <h3 className="text-xl font-bold tracking-tight text-black">Which feature do you value the most?</h3>
-          <div className="mt-5 space-y-3">
-            {[['Ease of use', '48%', 'w-[48%]', 'bg-blue-500'], ['Design', '28%', 'w-[28%]', 'bg-orange-400'], ['Performance', '15%', 'w-[15%]', 'bg-green-500'], ['Support', '9%', 'w-[9%]', 'bg-red-500']].map(([l, p, w, c]) => (
-              <div key={l}>
-                <div className="flex justify-between text-xs font-bold text-gray-800 mb-1">
-                  <span>{l}</span><span>{p}</span>
+          <h3 className="text-xl font-black tracking-tight text-black drop-shadow-sm">Which feature do you value the most?</h3>
+          <div className="mt-6 space-y-4">
+            <AnimatePresence>
+              {pollData.map(({ l, p, c }) => (
+                <div key={l} className="relative">
+                  <div className="flex justify-between text-xs font-bold text-gray-800 mb-1.5 drop-shadow-sm">
+                    <span>{l}</span>
+                    <motion.span layout>{p}%</motion.span>
+                  </div>
+                  <div className="h-2.5 w-full rounded-full bg-white/50 overflow-hidden shadow-inner border border-white/40">
+                    <motion.div
+                      layout
+                      initial={{ width: 0 }}
+                      animate={{ width: `${p}%` }}
+                      transition={{ type: "spring", bounce: 0.2, duration: 1.2 }}
+                      className={`h-full ${c} rounded-full shadow-sm`}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }} 
-                    animate={{ width: p }} 
-                    transition={{ duration: 1, delay: 1 }}
-                    className={`h-full ${w} ${c} rounded-full`} 
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="rounded-lg glass-panel p-5 shadow-sm border border-gray-100">
-           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Word Cloud</p>
-           <div className="flex flex-wrap gap-1.5 items-center justify-center text-center mt-4">
-             <span className="text-blue-600 text-lg font-bold">interactive</span>
-             <span className="text-red-500 text-2xl font-black">awesome</span>
-             <span className="text-green-600 text-sm font-bold">engaging</span>
-             <span className="text-orange-500 text-xs font-bold">simple</span>
-           </div>
-        </div>
-        
-        <div className="rounded-lg glass-panel p-5 shadow-sm border border-gray-100">
-           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Rating</p>
-           <p className="text-sm font-bold text-black mb-2">How would you rate your experience?</p>
-           <div className="flex gap-1 mb-2">
-             {[1,2,3,4].map(i => <Star key={i} className="h-4 w-4 fill-orange-400 text-orange-400" />)}
-             <Star className="h-4 w-4 fill-gray-200 text-gray-200" />
-           </div>
-           <p className="text-xs font-bold text-gray-800">4.6 Average</p>
-        </div>
+        <motion.div
+          animate={{ y: [0, -8, 0] }}
+          transition={{ repeat: Infinity, duration: 5, delay: 1, ease: "easeInOut" }}
+          style={{ transform: "translateZ(60px)" }}
+          className="rounded-xl glass-panel p-5 shadow-2xl border border-white/60 bg-white/50"
+        >
+          <p className="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-2 drop-shadow-sm">Word Cloud</p>
+          <div className="flex flex-wrap gap-2 items-center justify-center text-center mt-5">
+            <motion.span animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 3 }} className="text-blue-600 text-lg font-black drop-shadow-sm">interactive</motion.span>
+            <span className="text-red-500 text-3xl font-black drop-shadow-sm">awesome</span>
+            <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 4, delay: 1 }} className="text-green-600 text-sm font-black drop-shadow-sm">engaging</motion.span>
+            <span className="text-orange-500 text-xs font-bold drop-shadow-sm">simple</span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, -6, 0] }}
+          transition={{ repeat: Infinity, duration: 5.5, delay: 2, ease: "easeInOut" }}
+          style={{ transform: "translateZ(20px)" }}
+          className="rounded-xl glass-panel p-5 shadow-xl border border-white/60 bg-white/40"
+        >
+          <p className="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-2 drop-shadow-sm">Rating</p>
+          <p className="text-sm font-black text-black mb-3 leading-tight drop-shadow-sm">How would you rate your experience?</p>
+          <div className="flex gap-1.5 mb-2">
+            {[1, 2, 3, 4].map(i => <Star key={i} className="h-5 w-5 fill-orange-400 text-orange-400 drop-shadow-sm" />)}
+            <Star className="h-5 w-5 fill-white text-white drop-shadow-sm opacity-80" />
+          </div>
+          <p className="text-xs font-bold text-gray-700 mt-2">4.6 Average</p>
+        </motion.div>
       </motion.div>
     </section>
   );
@@ -235,7 +275,7 @@ function Marquee() {
       {/* Edge Gradients for smooth fade effect */}
       <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-      
+
       <motion.div
         className="flex flex-shrink-0 items-center gap-x-12 px-6 w-max text-xs font-bold uppercase tracking-widest text-gray-500"
         animate={{ x: ["0%", "-50%"] }}
@@ -302,11 +342,11 @@ function HowItWorks() {
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-neutral-900">Three steps. Live audience.</h2>
           <p className="mt-4 text-lg text-neutral-600">You focus on the presentation. We'll handle the engagement.</p>
         </div>
-        
+
         <div className="grid gap-8 md:grid-cols-3 relative">
           {/* Connector Line for Desktop */}
           <div className="hidden md:block absolute top-12 left-24 right-24 h-[1px] bg-neutral-200 z-0" />
-          
+
           {steps.map((s, i) => (
             <div key={s.n} className="relative z-10 flex flex-col items-center text-center">
               <div className="h-24 w-24 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center mb-6">
@@ -352,7 +392,7 @@ function Footer() {
           <Logo />
         </div>
         <p className="flex items-center drop-shadow-sm">
-          Made with <span className="text-red-500 mx-1.5">❤</span> by 
+          Made with <span className="text-red-500 mx-1.5">❤</span> by
           <a href="https://github.com/PrayatshuMisra" target="_blank" rel="noreferrer" className="ml-1.5 text-blue-700 hover:text-blue-900 hover:underline transition-colors">
             Prayatshu Misra
           </a>
