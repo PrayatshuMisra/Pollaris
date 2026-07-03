@@ -33,3 +33,4 @@ dist-ssr
 
 #env files
 .env
+*.env
