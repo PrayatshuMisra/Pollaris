@@ -46,6 +46,7 @@ function AudienceView() {
   const slideQ = useQuery({
     queryKey: ["p", code, "slide", session?.current_slide_id],
     enabled: !!session?.current_slide_id,
+    refetchInterval: 3000,
     queryFn: async (): Promise<Slide | null> => {
       if (!session?.current_slide_id) return null;
       const { data, error } = await supabase.from("slides").select("*").eq("id", session.current_slide_id).maybeSingle();

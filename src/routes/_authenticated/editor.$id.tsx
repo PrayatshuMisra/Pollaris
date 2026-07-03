@@ -193,6 +193,12 @@ function EditorPage() {
       const first = slides[0];
       await supabase.from("sessions").update({ status: "ended", ended_at: new Date().toISOString() })
         .eq("presentation_id", id).eq("status", "live");
+
+      if (first.config && (first.config as any).timer) {
+        await supabase.from("slides").update({
+          config: { ...first.config, timer_started_at: Date.now() }
+        }).eq("id", first.id);
+      }
       let code = generateJoinCode();
       for (let attempt = 0; attempt < 4; attempt++) {
         const { data, error } = await supabase

@@ -59,6 +59,19 @@ function PresentPage() {
   const currentIdx = Math.max(0, slides.findIndex((s) => s.id === session?.current_slide_id));
   const currentSlide = slides[currentIdx] ?? null;
 
+  useEffect(() => {
+    if (!currentSlide || !session) return;
+    const config = currentSlide.config as any;
+    // Auto-start the timer if it's configured but hasn't been started (e.g., first slide)
+    if (config?.timer && !config.timer_started_at) {
+      supabase.from("slides").update({
+        config: { ...config, timer_started_at: Date.now() }
+      }).eq("id", currentSlide.id).then(() => {
+        slidesQ.refetch();
+      });
+    }
+  }, [currentSlide?.id, session?.id]);
+
   const timer = (currentSlide?.config as any)?.timer as number | undefined;
   const timerStartedAt = (currentSlide?.config as any)?.timer_started_at as number | undefined;
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
