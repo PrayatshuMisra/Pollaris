@@ -346,13 +346,18 @@ function CTA() {
 
 function Footer() {
   return (
-    <footer className="border-t border-gray-200 mt-12 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm font-semibold text-gray-500 md:flex-row">
+    <footer className="border-t border-white/40 mt-12 glass">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 py-10 text-sm font-semibold text-gray-700 md:flex-row">
         <div className="flex items-center gap-3">
           <Logo />
-          <span className="font-bold text-black">Pollaris</span>
         </div>
-        <p>© {new Date().getFullYear()} Pollaris. All rights reserved.</p>
+        <p className="flex items-center drop-shadow-sm">
+          Made with <span className="text-red-500 mx-1.5">❤</span> by 
+          <a href="https://github.com/PrayatshuMisra" target="_blank" rel="noreferrer" className="ml-1.5 text-blue-700 hover:text-blue-900 hover:underline transition-colors">
+            Prayatshu Misra
+          </a>
+        </p>
+        <p className="text-gray-500">© {new Date().getFullYear()} Pollaris.</p>
       </div>
     </footer>
   );

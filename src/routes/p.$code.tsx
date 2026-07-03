@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, Radio, Star } from "lucide-react";
+import { CheckCircle2, Loader2, Radio, Star, Timer } from "lucide-react";
 
 export const Route = createFileRoute("/p/$code")({
   head: () => ({
@@ -195,9 +195,31 @@ function SlideResponder({
 }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
+
+  const timer = (slide.config as any)?.timer as number | undefined;
+  const timerStartedAt = (slide.config as any)?.timer_started_at as number | undefined;
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!timer || !timerStartedAt) {
+      setTimeLeft(null);
+      return;
+    }
+    const update = () => {
+      const elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+      const remaining = Math.max(0, timer - elapsed);
+      setTimeLeft(remaining);
+      if (remaining === 0) setTimeUp(true);
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [timer, timerStartedAt]);
 
   useEffect(() => {
     setSubmitted(false);
+    setTimeUp(false);
     // check if this participant already voted for this slide
     supabase
       .from("votes")
@@ -211,6 +233,7 @@ function SlideResponder({
   }, [slide.id, participantId]);
 
   async function submit(value: Record<string, unknown>) {
+    if (timeUp) return;
     setSubmitting(true);
     try {
       const { error } = await supabase.from("votes").insert({
@@ -233,13 +256,28 @@ function SlideResponder({
     }
   }
 
+  if (timeUp && !submitted) {
+    return (
+      <motion.div
+        key="timeup"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-xl border border-red-500/20 bg-red-50/50 p-10 text-center shadow-sm"
+      >
+        <Timer className="mx-auto h-12 w-12 text-red-500 mb-4" />
+        <h2 className="text-xl font-bold tracking-tight text-red-900">Time's up!</h2>
+        <p className="mt-2 text-sm text-red-700 font-medium">Voting has closed for this question.</p>
+      </motion.div>
+    );
+  }
+
   if (submitted) {
     return (
       <motion.div
         key="thanks"
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-border bg-card p-10 text-center shadow-sm"
+        className="rounded-xl border border-border bg-card p-10 text-center shadow-sm glass-panel"
       >
         <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
         <h2 className="mt-5 text-xl font-semibold tracking-tight">Response received</h2>
@@ -253,11 +291,18 @@ function SlideResponder({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="rounded-xl border border-border bg-card p-8 md:p-10 shadow-sm"
+      className="rounded-xl border border-border glass-panel p-8 md:p-10 shadow-sm relative overflow-hidden"
     >
-      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-        {slide.type.replace("_", " ")}
-      </p>
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mt-1">
+          {slide.type.replace("_", " ")}
+        </p>
+        {timeLeft !== null && (
+          <div className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md shadow-sm border shrink-0 ${timeLeft <= 5 ? "bg-red-100/80 text-red-700 border-red-200 animate-pulse" : "bg-white/60 text-blue-700 border-blue-200"}`}>
+            <Timer className="h-3.5 w-3.5" /> {timeLeft}s left
+          </div>
+        )}
+      </div>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">
         {slide.question || "Question"}
       </h1>

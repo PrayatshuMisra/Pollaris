@@ -321,7 +321,7 @@ function EditorPage() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2 }}
-              className="glass-panel rounded-2xl shadow-2xl border border-white/80 p-6 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+              className="glass-panel rounded-2xl shadow-2xl border border-white/80 p-6 sm:p-8 lg:p-12 flex flex-col justify-center text-center overflow-hidden"
               style={{
                 aspectRatio: "16/9",
                 width: "100%",
@@ -329,7 +329,24 @@ function EditorPage() {
                 maxWidth: "calc((100vh - 12rem) * 16 / 9)"
               }}
             >
-              <SlideEditor slide={selectedSlide} onChange={patchSlideLocal} />
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-black drop-shadow-sm break-words">
+                {selectedSlide.question || "Your question here"}
+              </h1>
+              {selectedSlide.description && (
+                <p className="mt-6 text-xl text-gray-700 font-medium">
+                  {selectedSlide.description}
+                </p>
+              )}
+              {selectedSlide.type === "multiple_choice" && (
+                <div className="mt-12 grid grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
+                  {((selectedSlide.config as any)?.choices || []).map((c: any, i: number) => (
+                    <div key={c.id} className="glass-panel bg-white/40 border-white/60 p-4 rounded-xl font-bold text-gray-800 shadow-sm flex items-center justify-center gap-3">
+                      {c.image_url && <img src={c.image_url} alt="option" className="w-10 h-10 rounded-md object-cover shadow-sm" />}
+                      <span className="truncate">{c.label || `Option ${i + 1}`}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           ) : (
             <div className="text-center text-sm font-bold text-gray-700 glass px-6 py-3 rounded-full shadow-lg border border-white/60">Select a slide to edit</div>
@@ -343,22 +360,39 @@ function EditorPage() {
              <div className="font-bold text-sm text-gray-500 hover:text-gray-800 pb-1 cursor-pointer transition-colors">Design</div>
           </div>
           <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-8">
-            {/* Slide Type Selection */}
-            <div>
-              <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
-              {selectedSlide && (
-                <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
-              )}
-            </div>
-            
-            {/* Settings */}
-            <div>
-              <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Settings</p>
-              <div className="rounded-xl border border-white/60 glass-panel p-4 shadow-sm flex items-start gap-3">
-                 <Settings className="h-5 w-5 text-gray-700 mt-0.5 shrink-0" />
-                 <span className="text-sm font-bold text-gray-900 leading-snug">Advanced settings available during presentation.</span>
-              </div>
-            </div>
+            {selectedSlide ? (
+              <>
+                {/* Slide Type Selection */}
+                <div>
+                  <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
+                  <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
+                </div>
+                
+                {/* Slide Editor Fields */}
+                <div className="border-t border-white/40 pt-6">
+                  <SlideEditor slide={selectedSlide} onChange={patchSlideLocal} />
+                </div>
+
+                {/* Timer Configuration */}
+                <div className="border-t border-white/40 pt-6">
+                  <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Time limit (Seconds)</p>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="600"
+                    value={(selectedSlide.config as any)?.timer ?? ""}
+                    onChange={(e) => {
+                      const timerVal = e.target.value ? parseInt(e.target.value, 10) : null;
+                      patchSlideLocal({ config: { ...selectedSlide.config, timer: timerVal } });
+                    }}
+                    placeholder="No limit"
+                    className="bg-white/40 border-white/60 font-bold text-gray-900 shadow-inner rounded-xl"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="text-center text-sm font-bold text-gray-500 mt-10">Select a slide to configure</div>
+            )}
           </div>
         </aside>
       </div>

@@ -8,7 +8,7 @@ import type { Slide, Session, Vote } from "@/lib/types";
 import { ResultsView } from "@/components/results-view";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, ChevronLeft, ChevronRight, Copy, Loader2, PowerOff, Users,
+  ArrowLeft, ChevronLeft, ChevronRight, Copy, Loader2, PowerOff, Users, Maximize, Minimize, Timer
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,6 +23,7 @@ function PresentPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [votes, setVotes] = useState<Vote[]>([]);
   const [audienceCount, setAudienceCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const sessionQ = useQuery({
     queryKey: ["session", "live", id],
@@ -57,6 +58,39 @@ function PresentPage() {
   const slides = slidesQ.data ?? [];
   const currentIdx = Math.max(0, slides.findIndex((s) => s.id === session?.current_slide_id));
   const currentSlide = slides[currentIdx] ?? null;
+
+  const timer = (currentSlide?.config as any)?.timer as number | undefined;
+  const timerStartedAt = (currentSlide?.config as any)?.timer_started_at as number | undefined;
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    const onFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  useEffect(() => {
+    if (!timer || !timerStartedAt) {
+      setTimeLeft(null);
+      return;
+    }
+    const update = () => {
+      const elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+      const remaining = Math.max(0, timer - elapsed);
+      setTimeLeft(remaining);
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [timer, timerStartedAt]);
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
 
   // Load votes for current slide
   useEffect(() => {
@@ -115,7 +149,7 @@ function PresentPage() {
   useEffect(() => {
     if (!session) return;
     const url = `${window.location.origin}/p/${session.join_code}`;
-    QRCode.toDataURL(url, { margin: 1, color: { dark: "#ffffff", light: "#00000000" }, width: 240 })
+    QRCode.toDataURL(url, { margin: 1, color: { dark: "#000000ff", light: "#00000000" }, width: 240 })
       .then(setQrDataUrl)
       .catch(() => {});
   }, [session?.join_code]);
@@ -124,12 +158,21 @@ function PresentPage() {
     if (!session || !slides.length) return;
     const next = slides[Math.max(0, Math.min(slides.length - 1, currentIdx + delta))];
     if (!next || next.id === session.current_slide_id) return;
+    
+    if (next.config && (next.config as any).timer) {
+      await supabase.from("slides").update({
+        config: { ...next.config, timer_started_at: Date.now() }
+      }).eq("id", next.id);
+    }
+
     await supabase.from("sessions").update({ current_slide_id: next.id }).eq("id", session.id);
     sessionQ.refetch();
+    slidesQ.refetch();
   }
 
   async function endSession() {
     if (!session) return;
+    if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
     await supabase.from("sessions")
       .update({ status: "ended", ended_at: new Date().toISOString() })
       .eq("id", session.id);
@@ -141,7 +184,8 @@ function PresentPage() {
     function onKey(e: KeyboardEvent) {
       if (e.key === "ArrowRight" || e.key === " " ) { e.preventDefault(); goto(1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); goto(-1); }
-      if (e.key === "Escape") endSession();
+      if (e.key === "f") { e.preventDefault(); toggleFullscreen(); }
+      if (e.key === "Escape" && !document.fullscreenElement) endSession();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -186,9 +230,19 @@ function PresentPage() {
             </span>
           </div>
           <div className="flex items-center gap-5">
+            {timeLeft !== null && (
+              <div className="flex items-center gap-2 text-sm font-black text-gray-900 drop-shadow-sm bg-white/40 px-3 py-1.5 rounded-full border border-white/60 shadow-inner">
+                <Timer className="h-4 w-4 text-blue-600" />
+                <span className={timeLeft === 0 ? "text-red-600 animate-pulse" : ""}>{timeLeft}s</span>
+              </div>
+            )}
             <div className="flex items-center gap-2 text-sm font-bold text-gray-700 drop-shadow-sm">
               <Users className="h-4 w-4" /> {audienceCount}
             </div>
+            <div className="h-4 w-px bg-white/40 mx-1" />
+            <Button size="icon" variant="ghost" className="rounded-full h-8 w-8 text-gray-700 hover:bg-white/60 hover:text-black transition-colors" onClick={toggleFullscreen} title="Toggle Fullscreen (f)">
+              {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+            </Button>
             <Button size="sm" variant="outline" className="rounded-full font-bold glass border-white/60 text-gray-900 hover:bg-red-100 hover:text-red-700 hover:border-red-200 transition-colors shadow-sm px-5" onClick={endSession}>
               <PowerOff className="mr-1.5 h-3.5 w-3.5" /> End presentation
             </Button>
@@ -256,7 +310,7 @@ function PresentPage() {
           </div>
           {qrDataUrl && (
             <div className="mt-8 rounded-xl bg-white/50 p-5 border border-white/60 shadow-inner flex flex-col items-center">
-              <img src={qrDataUrl} alt="Join QR code" className="w-full max-w-[200px] rounded-md mix-blend-multiply" />
+              <img src={qrDataUrl} alt="Join QR code" className="w-full max-w-[200px] rounded-md drop-shadow-sm" />
               <p className="mt-4 text-center text-xs font-bold text-gray-600">Or scan to join</p>
             </div>
           )}

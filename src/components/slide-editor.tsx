@@ -19,9 +19,9 @@ export function SlideEditor({ slide, onChange }: Props) {
           value={slide.question}
           onChange={(e) => onChange({ question: e.target.value })}
           placeholder="Ask your audience something…"
-          rows={2}
+          rows={3}
           maxLength={300}
-          className="mt-2 resize-none border-0 bg-transparent px-0 text-3xl font-black text-black leading-tight tracking-tight focus-visible:ring-0 md:text-5xl placeholder:text-gray-400 drop-shadow-sm"
+          className="mt-2 resize-none border border-white/60 bg-white/40 shadow-inner rounded-xl px-3 py-2 text-xl font-bold text-gray-900 leading-tight focus-visible:ring-0 placeholder:text-gray-400"
         />
       </div>
       <div>
@@ -31,7 +31,7 @@ export function SlideEditor({ slide, onChange }: Props) {
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder="Add a note or context"
           maxLength={200}
-          className="mt-2 border-0 border-b border-white/60 bg-transparent px-0 text-lg font-bold text-gray-700 focus-visible:ring-0 placeholder:text-gray-400 shadow-none rounded-none"
+          className="mt-2 border border-white/60 bg-white/40 shadow-inner rounded-xl px-3 text-sm font-bold text-gray-700 focus-visible:ring-0 placeholder:text-gray-400"
         />
       </div>
 
