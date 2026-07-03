@@ -292,36 +292,51 @@ function Marquee() {
 }
 
 const features = [
-  { icon: Vote, title: "Every poll type you need", body: "Multiple choice, word cloud, ratings, open text — each with its own optimized UI.", tag: "bg-blue-100 text-blue-700" },
-  { icon: Zap, title: "Real-time, actually", body: "Slide changes and votes propagate instantly across every screen. No refresh required.", tag: "bg-orange-100 text-orange-700" },
-  { icon: BarChart3, title: "Beautiful live results", body: "Bars animate, word clouds bloom, ratings tick up. Your audience feels the pulse.", tag: "bg-red-100 text-red-700" },
-  { icon: Cloud, title: "Zero setup", body: "Sign in, build slides, share a code. That's it. It just works.", tag: "bg-green-100 text-green-700" },
+  { id: "01", title: "Every poll type you need", body: "Multiple choice, word cloud, ratings, and open text. Each crafted with an optimized, distraction-free interface." },
+  { id: "02", title: "Real-time, actually", body: "Slide changes and votes propagate instantly across every screen. No refresh required. It just flows." },
+  { id: "03", title: "Beautiful live results", body: "Bars animate smoothly, word clouds bloom, and ratings tick up. Let your audience feel the pulse of the room." },
+  { id: "04", title: "Frictionless setup", body: "No downloads required. Sign in, build your slides, and share a code. Your audience joins in seconds." },
 ];
 
 function Features() {
   return (
-    <section id="features" className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-      <div className="max-w-2xl">
-        <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Features</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl text-black">
-          Built for the moment you press <span className="text-gray-400">Present.</span>
+    <section id="features" className="relative mx-auto max-w-6xl px-6 py-24 md:py-32">
+      {/* Subtle background glow to complement the glass theme */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-50/40 rounded-full blur-[100px] -z-10 pointer-events-none" />
+
+      <div className="max-w-2xl relative z-10">
+        <p className="text-sm font-bold uppercase tracking-widest text-blue-600 drop-shadow-sm">Features</p>
+        <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl text-black">
+          Built for the moment <br className="hidden sm:block" />
+          you press <span className="text-gray-400">Present.</span>
         </h2>
       </div>
-      <div className="mt-16 grid gap-6 md:grid-cols-2">
+      
+      <div className="mt-16 grid gap-6 md:grid-cols-2 lg:gap-8 relative z-10">
         {features.map((f, i) => (
           <motion.div
             key={f.title}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.3, delay: i * 0.05 }}
-            className="rounded-lg border border-gray-100 bg-white shadow-sm p-6 md:p-8 hover:shadow-md transition-shadow"
+            transition={{ duration: 0.5, delay: i * 0.1, ease: "easeOut" }}
+            // Changed border-white/60 to border-red-500
+            className="group relative overflow-hidden rounded-2xl glass-panel bg-white/40 border border-red-500 p-8 md:p-10 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
           >
-            <div className={`inline-flex h-10 w-10 items-center justify-center rounded-md mb-5 ${f.tag}`}>
-              <f.icon className="h-5 w-5" />
+            {/* Inner hover gradient for a premium glossy feel */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="relative z-10">
+              <span className="text-sm font-black text-gray-300 tracking-widest mb-6 block transition-colors group-hover:text-red-400">
+                {f.id}
+              </span>
+              <h3 className="text-xl font-bold text-black tracking-tight mb-3">
+                {f.title}
+              </h3>
+              <p className="text-base text-gray-700 leading-relaxed font-medium">
+                {f.body}
+              </p>
             </div>
-            <h3 className="text-lg font-bold text-black">{f.title}</h3>
-            <p className="mt-2 text-sm text-gray-600 leading-relaxed font-medium">{f.body}</p>
           </motion.div>
         ))}
       </div>
