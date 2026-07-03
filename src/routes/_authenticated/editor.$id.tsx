@@ -12,7 +12,7 @@ import { SlideEditor, SlideTypePicker } from "@/components/slide-editor";
 import { ResultsView } from "@/components/results-view";
 import { generateJoinCode } from "@/lib/join-code";
 import {
-  ArrowLeft, ChevronDown, ChevronUp, Copy, Play, Plus, Save, Trash2, Loader2,
+  ArrowLeft, ChevronDown, ChevronUp, Copy, Play, Plus, Save, Trash2, Loader2, Settings
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/editor/$id")({
@@ -93,7 +93,7 @@ function EditorPage() {
       if (p) {
         await supabase.from("presentations").update({ title: p.title, description: p.description }).eq("id", p.id);
       }
-      toast.success("Saved");
+      toast.success("Saved successfully");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to save");
     } finally {
@@ -172,12 +172,9 @@ function EditorPage() {
     setStarting(true);
     try {
       await saveAll();
-      // reuse existing live session for this presentation, or create one
       const first = slides[0];
-      // end any prior live sessions
       await supabase.from("sessions").update({ status: "ended", ended_at: new Date().toISOString() })
         .eq("presentation_id", id).eq("status", "live");
-      // create new
       let code = generateJoinCode();
       for (let attempt = 0; attempt < 4; attempt++) {
         const { data, error } = await supabase
@@ -210,113 +207,128 @@ function EditorPage() {
   }
 
   if (presentationQ.isLoading || slidesQ.isLoading) {
-    return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>;
+    return <div className="flex min-h-screen items-center justify-center bg-gray-50"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>;
   }
-  if (presentationQ.error) return <div className="p-10 text-center">Presentation not found.</div>;
+  if (presentationQ.error) return <div className="p-10 text-center text-gray-900 font-bold">Presentation not found.</div>;
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-background">
-      {/* toolbar */}
-      <div className="flex items-center justify-between gap-3 border-b border-border bg-background/80 px-6 py-3 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="h-4 w-4" />
+    <div className="flex h-screen flex-col bg-transparent text-gray-900 font-sans">
+      {/* Top Toolbar */}
+      <header className="flex h-14 items-center justify-between border-b border-white/50 glass px-4 shrink-0 z-10 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded text-gray-700 hover:bg-white/50 hover:text-gray-900 transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
           </Link>
+          <div className="h-6 w-px bg-white/40 mx-1" />
           <Input
             value={presentationQ.data?.title ?? ""}
             onChange={(e) => {
               const next = { ...(presentationQ.data as Presentation), title: e.target.value };
               qc.setQueryData(["presentation", id], next);
             }}
-            className="max-w-md border-0 bg-transparent text-base font-semibold tracking-tight focus-visible:ring-0 px-0 h-auto"
+            className="w-64 border-0 bg-transparent text-sm font-bold text-gray-900 focus-visible:ring-0 px-2 shadow-none hover:bg-white/40 rounded placeholder:text-gray-600 transition-colors"
           />
         </div>
+        
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={saveAll} disabled={saving} className="rounded-md font-medium">
-            {saving ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Save className="mr-1.5 h-3.5 w-3.5" />}
+          <Button variant="outline" size="sm" onClick={saveAll} disabled={saving} className="rounded glass border-white/60 text-gray-900 hover:bg-white/60 font-bold h-9 px-4 transition-colors">
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save
           </Button>
-          <Button size="sm" onClick={startPresentation} disabled={starting} className="rounded-md font-medium">
-            {starting ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1.5 h-3.5 w-3.5" />}
+          <Button size="sm" onClick={startPresentation} disabled={starting} className="rounded bg-black hover:bg-neutral-800 text-white font-bold shadow-md h-9 px-6 transition-colors">
+            {starting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4 fill-current" />}
             Present
           </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="grid flex-1 grid-cols-1 md:grid-cols-[260px_1fr_360px]">
-        {/* Slides sidebar */}
-        <aside className="border-r border-border bg-muted/20 p-4">
-          <div className="mb-4 flex items-center justify-between px-1">
-            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Slides</span>
-            <Button size="icon" variant="ghost" onClick={addSlide} className="h-7 w-7 rounded-md">
-              <Plus className="h-4 w-4" />
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar - Slides List */}
+        <aside className="w-[240px] flex-shrink-0 border-r border-white/50 glass flex flex-col overflow-hidden shadow-xl z-10">
+          <div className="p-4 border-b border-white/40">
+            <Button onClick={addSlide} className="w-full rounded glass border border-white/60 hover:bg-white/60 text-gray-900 shadow-sm font-bold h-10 transition-colors">
+              <Plus className="mr-2 h-4 w-4" /> New slide
             </Button>
           </div>
-          <div className="space-y-2">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {slides.map((s, i) => (
               <div
                 key={s.id}
-                className={`group cursor-pointer rounded-lg border px-3 py-2.5 text-sm transition-all ${
-                  selectedSlideId === s.id ? "border-border bg-card shadow-sm" : "border-transparent bg-muted/40 hover:bg-muted"
+                className={`group flex items-start gap-3 cursor-pointer p-1 -mx-1 rounded transition-colors ${
+                  selectedSlideId === s.id ? "bg-white/40" : "hover:bg-white/20"
                 }`}
                 onClick={() => setSelectedSlideId(s.id)}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-medium text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
-                  <div className="flex items-center gap-0.5 opacity-0 transition group-hover:opacity-100">
-                    <button className="rounded-md p-1 hover:bg-background border border-transparent hover:border-border hover:shadow-sm transition-all" onClick={(e) => { e.stopPropagation(); move(s.id, -1); }}><ChevronUp className="h-3 w-3 text-muted-foreground" /></button>
-                    <button className="rounded-md p-1 hover:bg-background border border-transparent hover:border-border hover:shadow-sm transition-all" onClick={(e) => { e.stopPropagation(); move(s.id, 1); }}><ChevronDown className="h-3 w-3 text-muted-foreground" /></button>
-                    <button className="rounded-md p-1 hover:bg-background border border-transparent hover:border-border hover:shadow-sm transition-all" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3 text-muted-foreground" /></button>
-                    <button className="rounded-md p-1 hover:bg-destructive/10 border border-transparent hover:border-destructive/20 transition-all text-destructive" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
+                <div className="font-bold text-gray-700 text-[11px] pt-1 w-4 text-center">{i + 1}</div>
+                <div className={`flex-1 rounded-md border-2 transition-all overflow-hidden ${selectedSlideId === s.id ? 'border-blue-500 shadow-md bg-white/50' : 'border-white/40 hover:border-white/60 bg-white/20'}`}>
+                  {/* Thumbnail Preview */}
+                  <div className="aspect-[4/3] bg-white/30 flex flex-col items-center justify-center p-2 relative backdrop-blur-sm">
+                    <span className="text-gray-900/20 text-4xl font-black opacity-30">{i + 1}</span>
+                    
+                    {/* Hover Actions */}
+                    <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="rounded glass border border-white/60 p-1 shadow-sm hover:bg-white/80 text-gray-800 transition-colors" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3" /></button>
+                      <button className="rounded glass border border-white/60 p-1 shadow-sm hover:bg-red-100 hover:border-red-300 text-red-600 transition-colors" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
+                    </div>
+                  </div>
+                  {/* Label */}
+                  <div className="bg-white/40 border-t border-white/50 py-1.5 px-2">
+                    <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wide truncate">
+                      {SLIDE_TYPE_LABELS[s.type]}
+                    </p>
                   </div>
                 </div>
-                <p className="mt-1.5 truncate text-xs font-medium">
-                  {s.question || <span className="text-muted-foreground italic">Untitled</span>}
-                </p>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {SLIDE_TYPE_LABELS[s.type]}
-                </p>
               </div>
             ))}
           </div>
         </aside>
 
-        {/* Center editor */}
-        <main className="grid-bg overflow-auto px-8 py-10">
+        {/* Center Canvas */}
+        <main className="flex-1 bg-transparent overflow-auto flex items-center justify-center p-4 md:p-8 relative">
           {selectedSlide ? (
             <motion.div
               key={selectedSlide.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mx-auto max-w-2xl"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+              className="glass-panel rounded-xl shadow-2xl border border-white/80 p-6 md:p-12 flex flex-col overflow-hidden"
+              style={{
+                aspectRatio: "16/9",
+                width: "100%",
+                maxHeight: "calc(100vh - 12rem)",
+                maxWidth: "calc((100vh - 12rem) * 16 / 9)"
+              }}
             >
               <SlideEditor slide={selectedSlide} onChange={patchSlideLocal} />
             </motion.div>
           ) : (
-            <div className="text-center text-sm font-medium text-muted-foreground mt-20">Select a slide</div>
+            <div className="text-center text-sm font-bold text-gray-700 glass px-6 py-3 rounded-full shadow-lg border border-white/60">Select a slide to edit</div>
           )}
         </main>
 
-        {/* Right panel */}
-        <aside className="border-l border-border bg-muted/20 p-5">
-          <div className="space-y-8">
+        {/* Right Sidebar - Configuration */}
+        <aside className="w-[340px] flex-shrink-0 border-l border-white/50 glass flex flex-col overflow-hidden shadow-xl z-10">
+          <div className="flex items-center gap-4 px-6 py-4 border-b border-white/40 bg-white/20">
+             <div className="font-bold text-sm text-gray-900 border-b-2 border-blue-600 pb-1 drop-shadow-sm">Content</div>
+             <div className="font-bold text-sm text-gray-500 hover:text-gray-800 pb-1 cursor-pointer transition-colors">Design</div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            {/* Slide Type Selection */}
             <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Slide type</p>
+              <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
               {selectedSlide && (
                 <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
               )}
             </div>
+            
+            {/* Settings */}
             <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live preview</p>
-              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-                {selectedSlide ? (
-                  <>
-                    <h4 className="text-sm font-semibold tracking-tight">{selectedSlide.question || "Your question"}</h4>
-                    <div className="mt-4">
-                      <ResultsView slide={selectedSlide} votes={[]} compact />
-                    </div>
-                  </>
-                ) : null}
+              <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Settings</p>
+              <div className="rounded-lg border border-white/60 glass p-4 shadow-sm flex items-center gap-3">
+                 <Settings className="h-5 w-5 text-gray-700" />
+                 <span className="text-sm font-bold text-gray-900">Advanced settings available during presentation.</span>
               </div>
             </div>
           </div>

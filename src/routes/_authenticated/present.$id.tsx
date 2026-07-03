@@ -170,25 +170,25 @@ function PresentPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-background">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-transparent font-sans text-gray-900">
       {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/50 glass px-6 py-3">
         <div className="flex items-center gap-4">
-          <Link to="/editor/$id" params={{ id }} className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/editor/$id" params={{ id }} className="text-gray-700 hover:text-black hover:bg-white/40 p-1.5 rounded-md transition-colors">
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <span className="flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Live
+          <span className="flex items-center gap-1.5 rounded-md bg-green-500/10 px-2 py-1 text-xs font-bold text-green-700 shadow-sm border border-green-500/20">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Live
           </span>
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-sm font-bold text-gray-700 drop-shadow-sm">
             Slide {currentIdx + 1} of {slides.length}
           </span>
         </div>
         <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm font-bold text-gray-700 drop-shadow-sm">
             <Users className="h-4 w-4" /> {audienceCount}
           </div>
-          <Button size="sm" variant="outline" className="rounded-md font-medium" onClick={endSession}>
+          <Button size="sm" variant="outline" className="rounded-md font-bold glass border-white/60 text-gray-900 hover:bg-white/60 transition-colors shadow-sm" onClick={endSession}>
             <PowerOff className="mr-1.5 h-3.5 w-3.5" /> End presentation
           </Button>
         </div>
@@ -196,7 +196,7 @@ function PresentPage() {
 
       <div className="grid flex-1 grid-cols-1 gap-6 p-6 md:grid-cols-[1fr_320px]">
         {/* Main stage */}
-        <div className="flex flex-col rounded-xl border border-border bg-card p-8 md:p-12 shadow-sm">
+        <div className="flex flex-col rounded-xl border border-white/80 glass-panel p-8 md:p-12 shadow-2xl relative overflow-hidden">
           <AnimatePresence mode="wait">
             {currentSlide && (
               <motion.div
@@ -207,25 +207,25 @@ function PresentPage() {
                 transition={{ duration: 0.35 }}
                 className="flex-1 flex flex-col"
               >
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                <p className="text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">
                   {currentSlide.type.replace("_", " ")}
                 </p>
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
+                <h1 className="mt-4 text-3xl font-black tracking-tight text-black drop-shadow-sm md:text-5xl">
                   {currentSlide.question || "Untitled question"}
                 </h1>
                 {currentSlide.description && (
-                  <p className="mt-4 text-lg text-muted-foreground leading-relaxed">{currentSlide.description}</p>
+                  <p className="mt-4 text-lg text-gray-700 font-medium leading-relaxed">{currentSlide.description}</p>
                 )}
                 <div className="mt-10 flex-1">
                   <ResultsView slide={currentSlide} votes={votes} />
                 </div>
-                <div className="mt-8 flex items-center justify-between border-t border-border pt-5 text-sm font-medium text-muted-foreground">
+                <div className="mt-8 flex items-center justify-between border-t border-white/40 pt-5 text-sm font-bold text-gray-600">
                   <span>{votes.length} vote{votes.length === 1 ? "" : "s"}</span>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => goto(-1)} disabled={currentIdx === 0} className="rounded-md h-8 w-8 p-0">
+                    <Button size="sm" variant="outline" onClick={() => goto(-1)} disabled={currentIdx === 0} className="rounded-md h-8 w-8 p-0 glass border-white/60 text-gray-900 hover:bg-white/60">
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => goto(1)} disabled={currentIdx >= slides.length - 1} className="rounded-md h-8 w-8 p-0">
+                    <Button size="sm" variant="outline" onClick={() => goto(1)} disabled={currentIdx >= slides.length - 1} className="rounded-md h-8 w-8 p-0 glass border-white/60 text-gray-900 hover:bg-white/60">
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
@@ -236,14 +236,14 @@ function PresentPage() {
         </div>
 
         {/* QR side */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Join at</p>
-          <p className="mt-2 font-mono text-lg font-medium">{window.location.host}/join</p>
-          <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Code</p>
-          <div className="mt-2 flex items-center justify-between gap-2 bg-muted/50 rounded-lg p-3 border border-border">
-            <span className="font-mono text-3xl font-semibold tracking-[0.2em]">{session.join_code}</span>
+        <div className="rounded-xl border border-white/60 glass-panel p-6 shadow-xl flex flex-col relative overflow-hidden">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">Join at</p>
+          <p className="mt-2 font-mono text-lg font-bold text-gray-900">{window.location.host}/join</p>
+          <p className="mt-8 text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">Code</p>
+          <div className="mt-2 flex items-center justify-between gap-2 bg-white/40 rounded-lg p-3 border border-white/50 shadow-inner">
+            <span className="font-mono text-3xl font-black text-gray-900 tracking-[0.2em] drop-shadow-sm">{session.join_code}</span>
             <button
-              className="rounded-md p-2 text-muted-foreground hover:bg-background hover:text-foreground border border-transparent hover:border-border hover:shadow-sm transition-all"
+              className="rounded-md p-2 text-gray-600 hover:bg-white/60 hover:text-black border border-transparent hover:border-white/80 hover:shadow-sm transition-all"
               onClick={() => {
                 navigator.clipboard.writeText(session.join_code);
                 toast.success("Code copied");
@@ -253,13 +253,13 @@ function PresentPage() {
             </button>
           </div>
           {qrDataUrl && (
-            <div className="mt-8 rounded-xl bg-muted p-5 border border-border/50">
-              <img src={qrDataUrl} alt="Join QR code" className="w-full rounded-md mix-blend-multiply dark:mix-blend-normal dark:invert" />
-              <p className="mt-4 text-center text-xs font-medium text-muted-foreground">Or scan to join</p>
+            <div className="mt-8 rounded-xl bg-white/50 p-5 border border-white/60 shadow-inner flex flex-col items-center">
+              <img src={qrDataUrl} alt="Join QR code" className="w-full max-w-[200px] rounded-md mix-blend-multiply" />
+              <p className="mt-4 text-center text-xs font-bold text-gray-600">Or scan to join</p>
             </div>
           )}
           <div className="mt-auto pt-8">
-            <p className="text-xs font-medium text-muted-foreground text-center">
+            <p className="text-xs font-bold text-gray-500 text-center">
               ← → to change slide · Esc to end
             </p>
           </div>

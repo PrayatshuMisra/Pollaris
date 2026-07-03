@@ -3,14 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, Presentation, Calendar, ArrowUpRight, Loader2 } from "lucide-react";
+import { Plus, Presentation, FolderOpen, LayoutTemplate, Trash2, MoreVertical, Play, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Presentation as PresentationT } from "@/lib/types";
 import { formatDistanceToNowStrict } from "@/lib/format-time";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Pollaris" }] }),
+  head: () => ({ meta: [{ title: "My presentations — Pollaris" }] }),
   component: Dashboard,
 });
 
@@ -36,11 +35,10 @@ function Dashboard() {
       if (!userData.user) throw new Error("Not signed in");
       const { data, error } = await supabase
         .from("presentations")
-        .insert({ owner_id: userData.user.id, title: "Untitled presentation" })
+        .insert({ owner_id: userData.user.id, title: "My new presentation" })
         .select()
         .single();
       if (error) throw error;
-      // seed one slide
       await supabase.from("slides").insert({
         presentation_id: data.id,
         order_index: 0,
@@ -48,9 +46,9 @@ function Dashboard() {
         question: "What's on your mind?",
         config: {
           choices: [
-            { id: crypto.randomUUID(), label: "Option A" },
-            { id: crypto.randomUUID(), label: "Option B" },
-            { id: crypto.randomUUID(), label: "Option C" },
+            { id: crypto.randomUUID(), label: "Option 1" },
+            { id: crypto.randomUUID(), label: "Option 2" },
+            { id: crypto.randomUUID(), label: "Option 3" },
           ],
         } as never,
       });
@@ -64,71 +62,91 @@ function Dashboard() {
   });
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Workspace</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Presentations</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Build a deck, share a code, watch answers land live.
-          </p>
+    <div className="flex min-h-[calc(100vh-64px)] text-gray-900">
+      {/* Sidebar */}
+      <aside className="w-64 glass border-r border-white/50 hidden md:block">
+        <div className="p-4 space-y-2">
+          <Button variant="ghost" className="w-full justify-start font-bold bg-white/50 text-blue-700 hover:bg-white/70 h-10 px-4 shadow-sm border border-white/60">
+            <Presentation className="mr-3 h-5 w-5" /> My presentations
+          </Button>
+          <Button variant="ghost" onClick={() => toast.info("Folders feature coming soon!")} className="w-full justify-start font-bold text-gray-800 hover:bg-white/40 h-10 px-4">
+            <FolderOpen className="mr-3 h-5 w-5" /> Folders
+          </Button>
+          <Button variant="ghost" onClick={() => toast.info("Inspiration templates coming soon!")} className="w-full justify-start font-bold text-gray-800 hover:bg-white/40 h-10 px-4">
+            <LayoutTemplate className="mr-3 h-5 w-5" /> Inspiration
+          </Button>
+          <div className="h-px bg-white/40 my-4 mx-4" />
+          <Button variant="ghost" onClick={() => toast.info("Trash coming soon!")} className="w-full justify-start font-bold text-gray-800 hover:bg-white/40 h-10 px-4">
+            <Trash2 className="mr-3 h-5 w-5" /> Trash
+          </Button>
         </div>
-        <Button size="lg" className="rounded-md font-medium px-6 h-11" disabled={create.isPending} onClick={() => create.mutate()}>
-          {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-          New presentation
-        </Button>
-      </div>
+      </aside>
 
-      <div className="mt-12">
-        {isLoading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-44 animate-pulse rounded-xl border border-border bg-muted/50" />
-            ))}
-          </div>
-        ) : presentations && presentations.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {presentations.map((p, i) => (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-              >
-                <Link to="/editor/$id" params={{ id: p.id }}>
-                  <Card className="group h-full cursor-pointer overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-border/80">
-                    <div className="flex items-start justify-between">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/5">
-                        <Presentation className="h-5 w-5 text-primary" />
-                      </div>
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
-                    </div>
-                    <h3 className="mt-5 truncate text-lg font-semibold tracking-tight">{p.title}</h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground leading-relaxed">
-                      {p.description ?? "No description yet."}
-                    </p>
-                    <div className="mt-6 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Updated {formatDistanceToNowStrict(new Date(p.updated_at))} ago
-                    </div>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border bg-card p-16 text-center shadow-sm">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-muted mb-4">
-              <Presentation className="h-6 w-6 text-muted-foreground" />
+      {/* Main Content */}
+      <main className="flex-1 p-6 md:p-8 overflow-auto">
+        <div className="flex flex-wrap items-center justify-between gap-4 max-w-6xl mx-auto">
+          <h1 className="text-[1.75rem] font-black text-gray-900 tracking-tight drop-shadow-sm">My presentations</h1>
+          <Button size="lg" className="rounded bg-black hover:bg-neutral-800 text-white shadow-md font-bold h-11 px-6" disabled={create.isPending} onClick={() => create.mutate()}>
+            {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            New presentation
+          </Button>
+        </div>
+
+        <div className="mt-8 max-w-6xl mx-auto">
+          {isLoading ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="aspect-[4/3] animate-pulse rounded-lg bg-white/20" />
+              ))}
             </div>
-            <h3 className="text-lg font-semibold tracking-tight">No presentations yet</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Create your first one — it takes seconds.</p>
-            <Button className="mt-6 rounded-md font-medium" onClick={() => create.mutate()}>
-              <Plus className="mr-2 h-4 w-4" /> New presentation
-            </Button>
-          </div>
-        )}
-      </div>
-    </main>
+          ) : presentations && presentations.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {presentations.map((p, i) => (
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="group relative flex flex-col rounded-lg glass shadow-md border border-white/60 hover:shadow-lg hover:border-white/80 transition-all overflow-hidden"
+                >
+                  <Link to="/editor/$id" params={{ id: p.id }} className="flex-1 flex flex-col">
+                    <div className="h-32 bg-white/30 border-b border-white/40 flex items-center justify-center relative group-hover:bg-white/50 transition-colors">
+                      <Presentation className="h-10 w-10 text-gray-600/50" strokeWidth={1} />
+                      <div className="absolute inset-0 bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
+                        <div className="rounded-full bg-white p-2 shadow-lg text-gray-900 hover:text-blue-600">
+                          <Play className="h-4 w-4 fill-current" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-gray-900 truncate leading-tight drop-shadow-sm">{p.title}</h3>
+                        <button className="text-gray-700 hover:text-black p-1 -mr-2 -mt-1 rounded-sm hover:bg-white/50" onClick={(e) => { e.preventDefault(); }}>
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <p className="mt-1.5 text-[11px] font-bold text-gray-600 uppercase tracking-wide">
+                        {p.updated_at ? `Updated ${formatDistanceToNowStrict(new Date(p.updated_at))} ago` : "Just now"}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg glass border border-white/60 p-16 text-center shadow-lg">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/50 border border-white/60 mb-5 shadow-inner">
+                <Presentation className="h-7 w-7 text-gray-600" />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 drop-shadow-sm">No presentations yet</h3>
+              <p className="mt-2 text-sm text-gray-800 font-bold">Create your first interactive presentation and engage your audience.</p>
+              <Button className="mt-6 rounded bg-black hover:bg-neutral-800 text-white shadow-md font-bold h-11 px-6" onClick={() => create.mutate()}>
+                <Plus className="mr-2 h-4 w-4" /> New presentation
+              </Button>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }

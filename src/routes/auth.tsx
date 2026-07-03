@@ -78,21 +78,21 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-transparent px-6 py-10 text-gray-900 font-sans">
       <div className="w-full max-w-[400px]">
-        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-black transition-colors">
           <ArrowLeft className="h-4 w-4" /> Back to home
         </Link>
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-border bg-card p-8 shadow-sm"
+          className="rounded-xl border border-white/60 glass-panel p-8 shadow-2xl relative overflow-hidden"
         >
           <div className="mb-8 flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-sm">
               <Radio className="h-4 w-4" strokeWidth={2.5} />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-2xl font-black tracking-tight drop-shadow-sm">
               {mode === "signin" ? "Welcome back" : "Create an account"}
             </h1>
           </div>
@@ -100,40 +100,40 @@ function AuthPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full rounded-md font-medium"
+            className="w-full rounded-md font-bold h-10 glass border-white/60 hover:bg-white/60 text-black shadow-sm transition-colors"
             onClick={signInGoogle}
           >
             <GoogleIcon /> Continue with Google
           </Button>
 
-          <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+          <div className="my-6 flex items-center gap-3 text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">
+            <div className="h-px flex-1 bg-white/40" /> or <div className="h-px flex-1 bg-white/40" />
           </div>
 
           <form onSubmit={submit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1">
-                <Label htmlFor="name" className="text-xs font-semibold uppercase text-muted-foreground">Name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} className="h-10 rounded-md" />
+                <Label htmlFor="name" className="text-xs font-bold uppercase text-gray-700 drop-shadow-sm">Name</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} className="h-10 rounded-md glass border-white/50 focus-visible:ring-black placeholder:text-gray-500 font-medium" />
               </div>
             )}
             <div className="space-y-1">
-              <Label htmlFor="email" className="text-xs font-semibold uppercase text-muted-foreground">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-10 rounded-md" />
+              <Label htmlFor="email" className="text-xs font-bold uppercase text-gray-700 drop-shadow-sm">Email</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-10 rounded-md glass border-white/50 focus-visible:ring-black placeholder:text-gray-500 font-medium" />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="password" className="text-xs font-semibold uppercase text-muted-foreground">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-10 rounded-md" />
+              <Label htmlFor="password" className="text-xs font-bold uppercase text-gray-700 drop-shadow-sm">Password</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-10 rounded-md glass border-white/50 focus-visible:ring-black placeholder:text-gray-500 font-medium" />
             </div>
-            <Button type="submit" disabled={loading} className="w-full rounded-md font-medium mt-2 h-10">
+            <Button type="submit" disabled={loading} className="w-full rounded-md font-bold mt-4 h-11 bg-black text-white hover:bg-neutral-800 shadow-md transition-colors">
               {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
             </Button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="mt-8 text-center text-sm font-bold text-gray-700 drop-shadow-sm">
             {mode === "signin" ? "New to Pollaris?" : "Already have an account?"}{" "}
             <button
-              className="font-medium text-foreground hover:underline"
+              className="font-black text-black hover:underline"
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
               type="button"
             >

@@ -95,7 +95,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen bg-[url('/bg.png')] bg-cover bg-fixed bg-center text-foreground antialiased">
         {children}
         <Scripts />
       </body>
