@@ -72,23 +72,35 @@ function Landing() {
 
 function Nav() {
   return (
-    <header className="sticky top-0 z-50 glass border-b border-white/50">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link to="/" className="flex items-center gap-2">
+    <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50">
+      <div className="mx-auto flex items-center justify-between px-6 py-3 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
+        <Link to="/" className="flex items-center gap-2 pr-4">
           <Logo />
-          <span className="text-xl font-bold tracking-tight">Pollaris</span>
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-gray-800 md:flex">
-          <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
-          <a href="#how" className="hover:text-blue-600 transition-colors">How it works</a>
-          <Link to="/join" className="hover:text-blue-600 transition-colors">Join a session</Link>
+        <nav className="hidden items-center gap-2 text-sm font-bold text-gray-800 md:flex">
+          <a href="#features" className="relative group px-4 py-2 rounded-full transition-all hover:bg-white/30">
+            Features
+            <span className="absolute left-1/2 bottom-1 h-0.5 w-0 -translate-x-1/2 bg-red-600 transition-all group-hover:w-1/2 rounded-full"></span>
+          </a>
+          <a href="#how" className="relative group px-4 py-2 rounded-full transition-all hover:bg-white/30">
+            How it works
+            <span className="absolute left-1/2 bottom-1 h-0.5 w-0 -translate-x-1/2 bg-green-600 transition-all group-hover:w-1/2 rounded-full"></span>
+          </a>
+          <Link to="/join" className="relative group px-4 py-2 rounded-full transition-all hover:bg-white/30">
+            Join a session
+            <span className="absolute left-1/2 bottom-1 h-0.5 w-0 -translate-x-1/2 bg-blue-600 transition-all group-hover:w-1/2 rounded-full"></span>
+          </Link>
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pl-4">
           <Link to="/auth">
-            <Button variant="ghost" size="sm" className="font-medium hover:bg-white/50 rounded-md">Log in</Button>
+            <Button variant="ghost" size="sm" className="font-bold text-green-800 hover:text-green-950 hover:bg-green-100/50 rounded-full px-5 transition-all">
+              Log in
+            </Button>
           </Link>
           <Link to="/auth">
-            <Button size="sm" className="font-medium rounded-md bg-black text-white hover:bg-neutral-800 shadow-none px-4">Get started</Button>
+            <Button size="sm" className="font-bold rounded-full bg-red-700 text-white hover:bg-red-800 shadow-[0_4px_14px_0_rgba(185,28,28,0.39)] px-6 transition-all hover:-translate-y-0.5">
+              Get started
+            </Button>
           </Link>
         </div>
       </div>
@@ -98,9 +110,7 @@ function Nav() {
 
 function Logo() {
   return (
-    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-black text-white">
-      <Radio className="h-4 w-4" strokeWidth={2.5} />
-    </div>
+    <img src="/logo4.png" alt="Pollaris Logo" className="h-12 object-contain" />
   );
 }
 
@@ -108,7 +118,7 @@ function Hero() {
   const [typewriterStep, setTypewriterStep] = useState(0);
 
   return (
-    <section className="relative px-6 pb-24 pt-8 md:pt-12 lg:pt-16 mx-auto max-w-6xl flex flex-col lg:flex-row items-center gap-16 lg:gap-12">
+    <section className="relative px-6 pb-24 pt-12 md:pt-20 lg:pt-28 mx-auto max-w-6xl flex flex-col lg:flex-row items-center gap-16 lg:gap-12">
       <div className="flex-1 max-w-2xl text-left">
         <h1 className="text-5xl leading-[1.1] font-bold tracking-tight md:text-[5rem] flex flex-col gap-1">
           <TypewriterLine 

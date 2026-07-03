@@ -88,10 +88,8 @@ function AuthPage() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl border border-white/60 glass-panel p-8 shadow-2xl relative overflow-hidden"
         >
-          <div className="mb-8 flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-sm">
-              <Radio className="h-4 w-4" strokeWidth={2.5} />
-            </div>
+          <div className="mb-8 flex flex-col items-center justify-center gap-4 text-center">
+            <img src="/logo4.png" alt="Pollaris Logo" className="h-10 object-contain" />
             <h1 className="text-2xl font-black tracking-tight drop-shadow-sm">
               {mode === "signin" ? "Welcome back" : "Create an account"}
             </h1>

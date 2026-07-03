@@ -230,35 +230,37 @@ function EditorPage() {
   if (presentationQ.error) return <div className="p-10 text-center text-gray-900 font-bold">Presentation not found.</div>;
 
   return (
-    <div className="flex h-screen flex-col bg-transparent text-gray-900 font-sans">
+    <div className="flex h-screen flex-col bg-transparent text-gray-900 font-sans pt-20">
       {/* Top Toolbar */}
-      <header className="flex h-14 items-center justify-between border-b border-white/50 glass px-4 shrink-0 z-10 shadow-sm">
-        <div className="flex items-center gap-2">
-          <Link to="/dashboard">
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded text-gray-700 hover:bg-white/50 hover:text-gray-900 transition-colors">
-              <ArrowLeft className="h-4 w-4" />
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1800px] z-50">
+        <div className="mx-auto flex items-center justify-between px-4 py-2 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
+          <div className="flex items-center gap-2">
+            <Link to="/dashboard">
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-gray-700 hover:bg-white/50 hover:text-gray-900 transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div className="h-6 w-px bg-white/40 mx-1" />
+            <Input
+              value={presentationQ.data?.title ?? ""}
+              onChange={(e) => {
+                const next = { ...(presentationQ.data as Presentation), title: e.target.value };
+                qc.setQueryData(["presentation", id], next);
+              }}
+              className="w-64 border-0 bg-transparent text-sm font-bold text-gray-900 focus-visible:ring-0 px-3 shadow-none hover:bg-white/40 rounded-full placeholder:text-gray-600 transition-colors"
+            />
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={saveAll} disabled={saving} className="rounded-full glass border-white/60 text-gray-900 hover:bg-white/60 font-bold h-9 px-5 transition-colors">
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save
             </Button>
-          </Link>
-          <div className="h-6 w-px bg-white/40 mx-1" />
-          <Input
-            value={presentationQ.data?.title ?? ""}
-            onChange={(e) => {
-              const next = { ...(presentationQ.data as Presentation), title: e.target.value };
-              qc.setQueryData(["presentation", id], next);
-            }}
-            className="w-64 border-0 bg-transparent text-sm font-bold text-gray-900 focus-visible:ring-0 px-2 shadow-none hover:bg-white/40 rounded placeholder:text-gray-600 transition-colors"
-          />
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={saveAll} disabled={saving} className="rounded glass border-white/60 text-gray-900 hover:bg-white/60 font-bold h-9 px-4 transition-colors">
-            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Save
-          </Button>
-          <Button size="sm" onClick={startPresentation} disabled={starting} className="rounded bg-black hover:bg-neutral-800 text-white font-bold shadow-md h-9 px-6 transition-colors">
-            {starting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4 fill-current" />}
-            Present
-          </Button>
+            <Button size="sm" onClick={startPresentation} disabled={starting} className="rounded-full bg-green-700 hover:bg-green-800 text-white font-bold shadow-md h-9 px-6 transition-all hover:-translate-y-0.5">
+              {starting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4 fill-current" />}
+              Present
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -289,6 +291,12 @@ function EditorPage() {
                     
                     {/* Hover Actions */}
                     <div className="absolute top-1 right-1 flex-col gap-1 hidden lg:group-hover:flex transition-opacity bg-white/20 p-0.5 rounded backdrop-blur-md border border-white/40">
+                      {i > 0 && (
+                        <button className="rounded hover:bg-white/80 text-gray-800 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); move(s.id, -1); }}><ChevronUp className="h-3 w-3" /></button>
+                      )}
+                      {i < slides.length - 1 && (
+                        <button className="rounded hover:bg-white/80 text-gray-800 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); move(s.id, 1); }}><ChevronDown className="h-3 w-3" /></button>
+                      )}
                       <button className="rounded hover:bg-white/80 text-gray-800 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); duplicateSlide(s); }}><Copy className="h-3 w-3" /></button>
                       <button className="rounded hover:bg-red-100 text-red-600 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); deleteSlide(s.id); }}><Trash2 className="h-3 w-3" /></button>
                     </div>

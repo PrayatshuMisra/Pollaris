@@ -170,29 +170,31 @@ function PresentPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-transparent font-sans text-gray-900">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-transparent font-sans text-gray-900 pt-20">
       {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/50 glass px-6 py-3">
-        <div className="flex items-center gap-4">
-          <Link to="/editor/$id" params={{ id }} className="text-gray-700 hover:text-black hover:bg-white/40 p-1.5 rounded-md transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <span className="flex items-center gap-1.5 rounded-md bg-green-500/10 px-2 py-1 text-xs font-bold text-green-700 shadow-sm border border-green-500/20">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Live
-          </span>
-          <span className="text-sm font-bold text-gray-700 drop-shadow-sm">
-            Slide {currentIdx + 1} of {slides.length}
-          </span>
-        </div>
-        <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2 text-sm font-bold text-gray-700 drop-shadow-sm">
-            <Users className="h-4 w-4" /> {audienceCount}
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1800px] z-50">
+        <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-2 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
+          <div className="flex items-center gap-4">
+            <Link to="/editor/$id" params={{ id }} className="text-gray-700 hover:text-gray-900 hover:bg-white/50 p-2 rounded-full transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-bold text-green-700 shadow-sm border border-green-500/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Live
+            </span>
+            <span className="text-sm font-bold text-gray-700 drop-shadow-sm ml-2">
+              Slide {currentIdx + 1} of {slides.length}
+            </span>
           </div>
-          <Button size="sm" variant="outline" className="rounded-md font-bold glass border-white/60 text-gray-900 hover:bg-white/60 transition-colors shadow-sm" onClick={endSession}>
-            <PowerOff className="mr-1.5 h-3.5 w-3.5" /> End presentation
-          </Button>
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2 text-sm font-bold text-gray-700 drop-shadow-sm">
+              <Users className="h-4 w-4" /> {audienceCount}
+            </div>
+            <Button size="sm" variant="outline" className="rounded-full font-bold glass border-white/60 text-gray-900 hover:bg-red-100 hover:text-red-700 hover:border-red-200 transition-colors shadow-sm px-5" onClick={endSession}>
+              <PowerOff className="mr-1.5 h-3.5 w-3.5" /> End presentation
+            </Button>
+          </div>
         </div>
-      </div>
+      </header>
 
       <div className="grid flex-1 grid-cols-1 gap-6 p-6 md:grid-cols-[1fr_320px]">
         {/* Main stage */}
