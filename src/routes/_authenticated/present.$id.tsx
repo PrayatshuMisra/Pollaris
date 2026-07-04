@@ -11,6 +11,7 @@ import {
   ArrowLeft, ChevronLeft, ChevronRight, Copy, Loader2, PowerOff, Users, Maximize, Minimize, Timer
 } from "lucide-react";
 import { toast } from "sonner";
+import { generateResultsPDF } from "@/lib/pdf";
 
 export const Route = createFileRoute("/_authenticated/present/$id")({
   head: () => ({ meta: [{ title: "Present - Pollaris" }] }),
@@ -185,6 +186,23 @@ function PresentPage() {
 
   async function endSession() {
     if (!session) return;
+    
+    try {
+      // Fetch all votes for the session to generate the final PDF report
+      const { data: allVotes } = await supabase
+        .from("votes")
+        .select("*")
+        .eq("session_id", session.id);
+        
+      if (allVotes && allVotes.length > 0) {
+        toast.info("Generating results PDF...");
+        generateResultsPDF(slides, allVotes as Vote[], session.join_code);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to generate PDF");
+    }
+
     if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
     await supabase.from("sessions")
       .update({ status: "ended", ended_at: new Date().toISOString() })
