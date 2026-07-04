@@ -151,8 +151,12 @@ function MCEditor({ slide, onChange }: Props) {
             {/* Image Preview */}
             {c.image_url && (
               <div className="ml-7 flex items-start gap-3 mt-1">
-                <div className="rounded-lg overflow-hidden border border-white/50 shadow-sm w-32 h-24 shrink-0">
-                  <img src={c.image_url} alt="Option preview" className="w-full h-full object-cover" />
+                <div className="rounded-lg overflow-hidden border border-white/50 shadow-sm w-32 h-24 shrink-0 relative bg-black/5 flex items-center justify-center">
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center blur-sm opacity-40 scale-110" 
+                    style={{ backgroundImage: `url(${c.image_url})` }} 
+                  />
+                  <img src={c.image_url} alt="Option preview" className="relative w-full h-full object-contain p-1 drop-shadow-sm" />
                 </div>
                 <Button 
                   variant="ghost" 

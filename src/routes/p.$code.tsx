@@ -339,8 +339,16 @@ function MCResponder({
           className="group relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-white/60 glass-panel bg-white/40 p-5 text-center transition-all hover:bg-white/60 hover:border-blue-400 hover:shadow-md disabled:opacity-50 min-h-[5rem]"
         >
           {c.image_url && (
-            <div className="mb-3 w-full flex items-center justify-center">
-              <img src={c.image_url} alt={c.label} className="max-h-32 rounded-lg object-cover shadow-sm transition-transform group-hover:scale-105 border border-white/50" />
+            <div className="mb-3 w-full h-32 relative overflow-hidden rounded-lg flex items-center justify-center border border-white/50 bg-black/5">
+              <div 
+                className="absolute inset-0 bg-cover bg-center blur-sm opacity-40 scale-110" 
+                style={{ backgroundImage: `url(${c.image_url})` }} 
+              />
+              <img 
+                src={c.image_url} 
+                alt={c.label} 
+                className="relative h-full w-full object-contain p-1 drop-shadow-sm transition-transform group-hover:scale-105" 
+              />
             </div>
           )}
           <span className="text-base font-bold text-gray-900 drop-shadow-sm">{c.label || "—"}</span>

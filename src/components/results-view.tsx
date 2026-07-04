@@ -49,10 +49,19 @@ function MCResults({ slide, votes, compact }: Props) {
                 className={`w-full overflow-hidden rounded-2xl flex flex-col shadow-2xl border border-white/60 ${color}`}
               >
                 {c.image_url ? (
-                  <div
-                    className="h-[140px] w-full shrink-0 bg-cover bg-center border-b border-black/10"
-                    style={{ backgroundImage: `url(${c.image_url})` }}
-                  />
+                  <div className="h-[140px] w-full shrink-0 relative overflow-hidden bg-black/5 border-b border-black/10 flex items-center justify-center">
+                    {/* Blurred backdrop to fill empty space */}
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center blur-md opacity-40 scale-110" 
+                      style={{ backgroundImage: `url(${c.image_url})` }} 
+                    />
+                    {/* Uncropped main image */}
+                    <img 
+                      src={c.image_url} 
+                      alt={c.label}
+                      className="relative h-full w-full object-contain p-2 drop-shadow-md"
+                    />
+                  </div>
                 ) : (
                   <div className="flex h-[140px] w-full shrink-0 items-center justify-center bg-white/20 border-b border-black/10">
                     <span className="text-xs font-bold uppercase tracking-widest text-black/40">No Image</span>
