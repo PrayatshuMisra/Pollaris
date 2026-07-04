@@ -123,15 +123,15 @@ function PresentPage() {
 
   // Realtime channel for votes + participants
   useEffect(() => {
-    if (!session) return;
+    if (!session || !currentSlide) return;
     const ch = supabase
-      .channel(`session:${session.id}`)
+      .channel(`session:${session.id}:slide:${currentSlide.id}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "votes", filter: `session_id=eq.${session.id}` },
         (payload) => {
           const v = payload.new as Vote;
-          if (v.slide_id !== session.current_slide_id) return;
+          if (v.slide_id !== currentSlide.id) return;
           setVotes((prev) => (prev.find((x) => x.id === v.id) ? prev : [...prev, v]));
         },
       )
@@ -151,7 +151,7 @@ function PresentPage() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [session?.id]);
+  }, [session?.id, currentSlide?.id]);
 
   // Reset votes when slide changes
   useEffect(() => {

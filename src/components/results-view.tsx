@@ -19,6 +19,60 @@ export function ResultsView({ slide, votes, compact }: Props) {
 function MCResults({ slide, votes, compact }: Props) {
   const { choices, total } = tallyMultipleChoice(slide, votes);
   const max = Math.max(1, ...choices.map((c) => c.count));
+  const hasImages = choices.some((c) => !!c.image_url);
+
+  if (hasImages && !compact) {
+    const colors = ["bg-[#6B8CFF]", "bg-[#FF7B72]", "bg-[#2A2B5F]", "bg-[#3FB950]", "bg-[#D2A8FF]", "bg-[#F5A623]", "bg-[#D0021B]"];
+    return (
+      <div className="flex h-[420px] w-full items-end justify-center gap-4 sm:gap-6 mt-8">
+        {choices.map((c, i) => {
+          const pct = total === 0 ? 0 : Math.round((c.count / total) * 100);
+          const barPct = max === 0 ? 0 : (c.count / max) * 100;
+          const color = colors[i % colors.length];
+
+          return (
+            <div key={c.id} className="flex h-full w-full max-w-[220px] flex-1 flex-col justify-end">
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-3 pl-1 text-3xl sm:text-4xl font-black text-gray-900 drop-shadow-sm"
+              >
+                {pct}%
+              </motion.div>
+
+              <motion.div
+                layout
+                initial={{ height: "140px" }}
+                animate={{ height: `calc(140px + ${barPct * 2.2}px)` }}
+                transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                className={`w-full overflow-hidden rounded-2xl flex flex-col shadow-2xl border border-white/60 ${color}`}
+              >
+                {c.image_url ? (
+                  <div
+                    className="h-[140px] w-full shrink-0 bg-cover bg-center border-b border-black/10"
+                    style={{ backgroundImage: `url(${c.image_url})` }}
+                  />
+                ) : (
+                  <div className="flex h-[140px] w-full shrink-0 items-center justify-center bg-white/20 border-b border-black/10">
+                    <span className="text-xs font-bold uppercase tracking-widest text-black/40">No Image</span>
+                  </div>
+                )}
+                <div className="flex-1 w-full relative">
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0)_100%)]" />
+                </div>
+              </motion.div>
+
+              <div className="mt-4 pl-1 text-lg sm:text-xl font-bold text-gray-900 drop-shadow-sm truncate w-full">
+                {c.label || "—"}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className={compact ? "space-y-2" : "space-y-3"}>
       {choices.map((c) => {
