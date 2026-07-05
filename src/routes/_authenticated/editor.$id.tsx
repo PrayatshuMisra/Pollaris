@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { SlideEditor, SlideTypePicker } from "@/components/slide-editor";
+import { DesignEditor } from "@/components/design-editor";
 import { ResultsView } from "@/components/results-view";
 import { generateJoinCode } from "@/lib/join-code";
 import {
@@ -230,13 +231,29 @@ function EditorPage() {
     }
   }
 
+  const [activeTab, setActiveTab] = useState<"content" | "design">("content");
+
+  const isDark = (selectedSlide?.config as any)?.design?.theme === 'dark';
+  const fontSize = (selectedSlide?.config as any)?.design?.fontSize || 'normal';
+  
+  const titleSizes = {
+    normal: "text-3xl sm:text-4xl md:text-5xl",
+    large: "text-4xl sm:text-5xl md:text-6xl",
+    huge: "text-5xl sm:text-6xl md:text-7xl"
+  };
+  const descSizes = {
+    normal: "text-xl",
+    large: "text-2xl",
+    huge: "text-3xl"
+  };
+
   if (presentationQ.isLoading || slidesQ.isLoading) {
     return <div className="flex min-h-screen items-center justify-center bg-gray-50"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>;
   }
   if (presentationQ.error) return <div className="p-10 text-center text-gray-900 font-bold">Presentation not found.</div>;
 
   return (
-    <div className="flex h-screen flex-col bg-transparent text-gray-900 font-sans pt-20">
+    <div className={`flex h-screen flex-col font-sans pt-20 transition-colors duration-700 ${isDark ? 'bg-[#222222] text-white' : 'bg-gray-50 text-gray-900'}`}>
       {/* Top Toolbar */}
       <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1800px] z-50">
         <div className="mx-auto flex items-center justify-between px-4 py-2 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
@@ -321,19 +338,13 @@ function EditorPage() {
 
         {/* Center Canvas */}
         <main className="flex-1 overflow-auto flex items-center justify-center p-4 sm:p-6 lg:p-8 relative min-h-[400px]">
-          {selectedSlide && (selectedSlide.config as any)?.bg_image_url && (
-            <div 
-              className="absolute inset-0 bg-cover bg-center z-0 opacity-40 blur-sm"
-              style={{ backgroundImage: `url(${(selectedSlide.config as any).bg_image_url})` }}
-            />
-          )}
           {selectedSlide ? (
             <motion.div
               key={selectedSlide.id}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2 }}
-              className="relative z-10 glass-panel rounded-2xl shadow-2xl border border-white/80 p-6 sm:p-8 lg:p-12 flex flex-col justify-center text-center overflow-hidden bg-white/70 backdrop-blur-xl"
+              className={`relative p-6 sm:p-8 lg:p-12 flex flex-col justify-center text-center overflow-hidden transition-colors duration-700 ${isDark ? 'bg-transparent border-none shadow-none text-white' : 'glass-panel rounded-2xl shadow-2xl border bg-white/70 border-white/80 text-black backdrop-blur-xl'} ${(selectedSlide.config as any)?.design?.font || 'font-sans'}`}
               style={{
                 aspectRatio: "16/9",
                 width: "100%",
@@ -342,24 +353,27 @@ function EditorPage() {
               }}
             >
               {(selectedSlide.config as any)?.bg_image_url && (
-                <div 
-                  className="absolute inset-0 bg-cover bg-center z-0 opacity-20"
-                  style={{ backgroundImage: `url(${(selectedSlide.config as any).bg_image_url})` }}
-                />
+                <>
+                  <div 
+                    className={`absolute ${isDark ? 'inset-[-200%]' : 'inset-0'} bg-cover bg-center z-[-2] opacity-40 transition-all duration-1000 ease-in-out`}
+                    style={{ backgroundImage: `url(${(selectedSlide.config as any).bg_image_url})` }}
+                  />
+                  <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/40 backdrop-blur-sm'} z-[-1] pointer-events-none`} />
+                </>
               )}
               <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-black drop-shadow-sm break-words w-full">
+                <h1 className={`${titleSizes[fontSize as keyof typeof titleSizes]} font-black drop-shadow-sm break-words w-full`}>
                   {selectedSlide.question || "Your question here"}
                 </h1>
                 {selectedSlide.description && (
-                  <p className="mt-6 text-xl text-gray-800 font-medium drop-shadow-sm">
+                  <p className={`mt-6 ${descSizes[fontSize as keyof typeof descSizes]} font-medium drop-shadow-sm opacity-90`}>
                     {selectedSlide.description}
                   </p>
                 )}
                 {selectedSlide.type === "multiple_choice" && (
                   <div className="mt-12 grid grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
                     {((selectedSlide.config as any)?.choices || []).map((c: any, i: number) => (
-                      <div key={c.id} className="glass-panel bg-white/60 border-white/60 p-4 rounded-xl font-bold text-gray-900 shadow-sm flex items-center justify-center gap-3 backdrop-blur-md">
+                      <div key={c.id} className={`glass-panel border p-4 rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 backdrop-blur-md ${(selectedSlide.config as any)?.design?.theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-white/60 border-white/60'}`}>
                         {c.image_url && <img src={c.image_url} alt="option" className="w-10 h-10 rounded-md object-cover shadow-sm" />}
                         <span className="truncate">{c.label || `Option ${i + 1}`}</span>
                       </div>
@@ -376,61 +390,86 @@ function EditorPage() {
         {/* Right Sidebar - Configuration */}
         <aside className="w-full lg:w-[320px] xl:w-[360px] flex-shrink-0 border-l border-white/50 glass flex flex-col overflow-hidden shadow-xl z-20 h-64 lg:h-auto border-t lg:border-t-0">
           <div className="flex items-center gap-6 px-6 py-4 border-b border-white/40 bg-white/20 shrink-0">
-             <div className="font-bold text-sm text-gray-900 border-b-2 border-blue-600 pb-1 drop-shadow-sm">Content</div>
-             <div className="font-bold text-sm text-gray-500 hover:text-gray-800 pb-1 cursor-pointer transition-colors">Design</div>
+             <div onClick={() => setActiveTab("content")} className={`font-bold text-sm cursor-pointer transition-colors pb-1 ${activeTab === 'content' ? 'text-gray-900 border-b-2 border-blue-600 drop-shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>Content</div>
+             <div onClick={() => setActiveTab("design")} className={`font-bold text-sm cursor-pointer transition-colors pb-1 ${activeTab === 'design' ? 'text-gray-900 border-b-2 border-blue-600 drop-shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>Design</div>
           </div>
           <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-8">
             {selectedSlide ? (
-              <>
-                {/* Slide Type Selection */}
-                <div>
-                  <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
-                  <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
-                </div>
-                
-                {/* Slide Editor Fields */}
-                <div className="border-t border-white/40 pt-6">
-                  <SlideEditor 
-                    slide={selectedSlide} 
-                    onChange={patchSlideLocal} 
-                    onApplyBackgroundToAll={async (bgUrl) => {
-                      const nextSlides = slides.map((s) => ({
-                        ...s,
-                        config: { ...(s.config as any), bg_image_url: bgUrl },
-                      }));
-                      qc.setQueryData(["slides", id], nextSlides);
-                      toast.info("Applying background to all slides...");
-                      try {
-                        await Promise.all(
-                          nextSlides.map((s) =>
-                            supabase.from("slides").update({ config: s.config as never }).eq("id", s.id)
-                          )
-                        );
-                        toast.success("Applied background to all slides");
-                      } catch (e) {
-                        toast.error("Failed to apply background");
-                      }
-                    }} 
-                  />
-                </div>
+              activeTab === "content" ? (
+                <>
+                  {/* Slide Type Selection */}
+                  <div>
+                    <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Slide type</p>
+                    <SlideTypePicker value={selectedSlide.type} onChange={changeType} />
+                  </div>
+                  
+                  {/* Slide Editor Fields */}
+                  <div className="border-t border-white/40 pt-6">
+                    <SlideEditor 
+                      slide={selectedSlide} 
+                      onChange={patchSlideLocal} 
+                      onApplyBackgroundToAll={async (bgUrl) => {
+                        const nextSlides = slides.map((s) => ({
+                          ...s,
+                          config: { ...(s.config as any), bg_image_url: bgUrl },
+                        }));
+                        qc.setQueryData(["slides", id], nextSlides);
+                        toast.info("Applying background to all slides...");
+                        try {
+                          await Promise.all(
+                            nextSlides.map((s) =>
+                              supabase.from("slides").update({ config: s.config as never }).eq("id", s.id)
+                            )
+                          );
+                          toast.success("Applied background to all slides");
+                        } catch (e) {
+                          toast.error("Failed to apply background");
+                        }
+                      }} 
+                    />
+                  </div>
 
-                {/* Timer Configuration */}
-                <div className="border-t border-white/40 pt-6">
-                  <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Time limit (Seconds)</p>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="600"
-                    value={(selectedSlide.config as any)?.timer ?? ""}
-                    onChange={(e) => {
-                      const timerVal = e.target.value ? parseInt(e.target.value, 10) : null;
-                      patchSlideLocal({ config: { ...selectedSlide.config, timer: timerVal } });
-                    }}
-                    placeholder="No limit"
-                    className="bg-white/40 border-white/60 font-bold text-gray-900 shadow-inner rounded-xl"
-                  />
-                </div>
-              </>
+                  {/* Timer Configuration */}
+                  <div className="border-t border-white/40 pt-6">
+                    <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-gray-600 drop-shadow-sm">Time limit (Seconds)</p>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="600"
+                      value={(selectedSlide.config as any)?.timer ?? ""}
+                      onChange={(e) => {
+                        const timerVal = e.target.value ? parseInt(e.target.value, 10) : null;
+                        patchSlideLocal({ config: { ...selectedSlide.config, timer: timerVal } });
+                      }}
+                      placeholder="No limit"
+                      className="bg-white/40 border-white/60 font-bold text-gray-900 shadow-inner rounded-xl"
+                    />
+                  </div>
+                </>
+              ) : (
+                <DesignEditor 
+                  slide={selectedSlide} 
+                  onChange={patchSlideLocal}
+                  onApplyDesignToAll={async (design) => {
+                    const nextSlides = slides.map((s) => ({
+                      ...s,
+                      config: { ...(s.config as any), design: { ...((s.config as any)?.design || {}), ...design } },
+                    }));
+                    qc.setQueryData(["slides", id], nextSlides);
+                    toast.info("Applying design to all slides...");
+                    try {
+                      await Promise.all(
+                        nextSlides.map((s) =>
+                          supabase.from("slides").update({ config: s.config as never }).eq("id", s.id)
+                        )
+                      );
+                      toast.success("Applied design to all slides");
+                    } catch (e) {
+                      toast.error("Failed to apply design");
+                    }
+                  }} 
+                />
+              )
             ) : (
               <div className="text-center text-sm font-bold text-gray-500 mt-10">Select a slide to configure</div>
             )}

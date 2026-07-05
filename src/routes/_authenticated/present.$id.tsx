@@ -245,45 +245,51 @@ function PresentPage() {
   }
 
   const bgUrl = (currentSlide?.config as any)?.bg_image_url as string | undefined;
+  const isDark = (currentSlide?.config as any)?.design?.theme === 'dark';
+  const fontSize = (currentSlide?.config as any)?.design?.fontSize || 'normal';
+
+  const titleSizes = {
+    normal: "text-3xl md:text-5xl",
+    large: "text-4xl md:text-6xl",
+    huge: "text-5xl md:text-7xl"
+  };
+  const descSizes = {
+    normal: "text-xl",
+    large: "text-2xl",
+    huge: "text-3xl"
+  };
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-transparent font-sans text-gray-900 pt-20 relative min-h-screen">
-      {bgUrl && (
-        <div 
-          className="fixed inset-0 bg-cover bg-center z-0 opacity-30 blur-sm pointer-events-none transition-all duration-1000 ease-in-out"
-          style={{ backgroundImage: `url(${bgUrl})` }}
-        />
-      )}
-      <div className="relative z-10 flex flex-col flex-1 w-full h-full">
+    <div className={`flex min-h-[calc(100vh-3.5rem)] flex-col pt-20 transition-colors duration-700 ${isDark ? 'bg-[#222222] text-white' : 'bg-gray-50 text-gray-900'} ${((currentSlide?.config as any)?.design?.font || 'font-sans')}`}>
       {/* Header bar */}
       <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1800px] z-50">
-        <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-2 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
+        <div className={`mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-2 rounded-full backdrop-blur-2xl transition-all ${isDark ? 'bg-white/10 border border-white/20' : 'bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)]'}`}>
           <div className="flex items-center gap-4">
-            <Link to="/editor/$id" params={{ id }} className="text-gray-700 hover:text-gray-900 hover:bg-white/50 p-2 rounded-full transition-colors">
+            <Link to="/editor/$id" params={{ id }} className={`${isDark ? 'text-white hover:bg-white/20' : 'text-gray-700 hover:text-gray-900 hover:bg-white/50'} p-2 rounded-full transition-colors`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
-            <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-bold text-green-700 shadow-sm border border-green-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Live
+            <span className="flex items-center gap-1.5 rounded-full bg-green-500/20 px-3 py-1 text-xs font-bold text-green-400 shadow-sm border border-green-500/30">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-400" /> Live
             </span>
-            <span className="text-sm font-bold text-gray-700 drop-shadow-sm ml-2">
+            <span className={`text-sm font-bold drop-shadow-sm ml-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
               Slide {currentIdx + 1} of {slides.length}
             </span>
           </div>
           <div className="flex items-center gap-5">
             {timeLeft !== null && (
-              <div className="flex items-center gap-2 text-sm font-black text-gray-900 drop-shadow-sm bg-white/40 px-3 py-1.5 rounded-full border border-white/60 shadow-inner">
-                <Timer className="h-4 w-4 text-blue-600" />
-                <span className={timeLeft === 0 ? "text-red-600 animate-pulse" : ""}>{timeLeft}s</span>
+              <div className={`flex items-center gap-2 text-sm font-black drop-shadow-sm px-3 py-1.5 rounded-full shadow-inner ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-white/40 text-gray-900 border border-white/60'}`}>
+                <Timer className={`h-4 w-4 ${isDark ? 'text-white' : 'text-blue-600'}`} />
+                <span className={timeLeft === 0 ? "text-red-500 animate-pulse" : ""}>{timeLeft}s</span>
               </div>
             )}
-            <div className="flex items-center gap-2 text-sm font-bold text-gray-700 drop-shadow-sm">
+            <div className={`flex items-center gap-2 text-sm font-bold drop-shadow-sm ${isDark ? 'text-white' : 'text-gray-700'}`}>
               <Users className="h-4 w-4" /> {audienceCount}
             </div>
             <div className="h-4 w-px bg-white/40 mx-1" />
-            <Button size="icon" variant="ghost" className="rounded-full h-8 w-8 text-gray-700 hover:bg-white/60 hover:text-black transition-colors" onClick={toggleFullscreen} title="Toggle Fullscreen (f)">
+            <Button size="icon" variant="ghost" className={`rounded-full h-8 w-8 transition-colors ${isDark ? 'text-white hover:bg-white/20' : 'text-gray-700 hover:bg-white/60 hover:text-black'}`} onClick={toggleFullscreen} title="Toggle Fullscreen (f)">
               {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
             </Button>
-            <Button size="sm" variant="outline" className="rounded-full font-bold glass border-white/60 text-gray-900 hover:bg-red-100 hover:text-red-700 hover:border-red-200 transition-colors shadow-sm px-5" onClick={endSession}>
+            <Button size="sm" variant="outline" className={`rounded-full font-bold transition-colors shadow-sm px-5 ${isDark ? 'bg-transparent border-white/40 text-white hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50' : 'glass border-white/60 text-gray-900 hover:bg-red-100 hover:text-red-700 hover:border-red-200'}`} onClick={endSession}>
               <PowerOff className="mr-1.5 h-3.5 w-3.5" /> End presentation
             </Button>
           </div>
@@ -292,7 +298,7 @@ function PresentPage() {
 
       <div className="grid flex-1 grid-cols-1 gap-6 p-6 md:grid-cols-[1fr_320px]">
         {/* Main stage */}
-        <div className="flex flex-col rounded-xl border border-white/80 glass-panel p-8 md:p-12 shadow-2xl relative overflow-hidden">
+        <div className={`flex flex-col p-8 md:p-12 relative overflow-hidden transition-colors duration-700 ${isDark ? 'bg-transparent border-none shadow-none text-white' : 'rounded-xl border bg-white/70 border-white/80 glass-panel shadow-2xl text-black backdrop-blur-xl'}`}>
           <AnimatePresence mode="wait">
             {currentSlide && (
               <motion.div
@@ -301,27 +307,36 @@ function PresentPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.35 }}
-                className="flex-1 flex flex-col"
+                className="flex-1 flex flex-col relative z-10"
               >
-                <p className="text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">
+                {bgUrl && (
+                  <>
+                    <div 
+                      className={`absolute ${isDark ? 'inset-[-200%]' : 'inset-0'} bg-cover bg-center z-[-2] opacity-40 transition-all duration-1000 ease-in-out`}
+                      style={{ backgroundImage: `url(${bgUrl})` }}
+                    />
+                    <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/80 backdrop-blur-sm'} z-[-1] pointer-events-none`} />
+                  </>
+                )}
+                <p className={`text-xs font-black uppercase tracking-widest drop-shadow-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   {currentSlide.type.replace("_", " ")}
                 </p>
-                <h1 className="mt-4 text-3xl font-black tracking-tight text-black drop-shadow-sm md:text-5xl">
+                <h1 className={`mt-4 ${titleSizes[fontSize as keyof typeof titleSizes]} font-black tracking-tight text-inherit drop-shadow-sm`}>
                   {currentSlide.question || "Untitled question"}
                 </h1>
                 {currentSlide.description && (
-                  <p className="mt-4 text-lg text-gray-700 font-medium leading-relaxed">{currentSlide.description}</p>
+                  <p className={`mt-4 ${descSizes[fontSize as keyof typeof descSizes]} opacity-90 font-medium leading-relaxed`}>{currentSlide.description}</p>
                 )}
                 <div className="mt-10 flex-1">
                   <ResultsView slide={currentSlide} votes={votes} />
                 </div>
-                <div className="mt-8 flex items-center justify-between border-t border-white/40 pt-5 text-sm font-bold text-gray-600">
+                <div className={`mt-8 flex items-center justify-between border-t pt-5 text-sm font-bold ${isDark ? 'border-white/10 text-gray-400' : 'border-white/40 text-gray-600'}`}>
                   <span>{votes.length} vote{votes.length === 1 ? "" : "s"}</span>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => goto(-1)} disabled={currentIdx === 0} className="rounded-md h-8 w-8 p-0 glass border-white/60 text-gray-900 hover:bg-white/60">
+                    <Button size="sm" variant="outline" onClick={() => goto(-1)} disabled={currentIdx === 0} className={`rounded-md h-8 w-8 p-0 transition-colors ${isDark ? 'bg-transparent border-white/20 text-white hover:bg-white/10' : 'glass border-white/60 text-gray-900 hover:bg-white/60'}`}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => goto(1)} disabled={currentIdx >= slides.length - 1} className="rounded-md h-8 w-8 p-0 glass border-white/60 text-gray-900 hover:bg-white/60">
+                    <Button size="sm" variant="outline" onClick={() => goto(1)} disabled={currentIdx >= slides.length - 1} className={`rounded-md h-8 w-8 p-0 transition-colors ${isDark ? 'bg-transparent border-white/20 text-white hover:bg-white/10' : 'glass border-white/60 text-gray-900 hover:bg-white/60'}`}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
@@ -332,35 +347,38 @@ function PresentPage() {
         </div>
 
         {/* QR side */}
-        <div className="rounded-xl border border-white/60 glass-panel p-6 shadow-xl flex flex-col relative overflow-hidden">
-          <p className="text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">Join at</p>
-          <p className="mt-2 font-mono text-lg font-bold text-gray-900">{window.location.host}/join</p>
-          <p className="mt-8 text-xs font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">Code</p>
-          <div className="mt-2 flex items-center justify-between gap-2 bg-white/40 rounded-lg p-3 border border-white/50 shadow-inner">
-            <span className="font-mono text-3xl font-black text-gray-900 tracking-[0.2em] drop-shadow-sm">{session.join_code}</span>
+        {/* QR side */}
+        <div className={`flex flex-col relative overflow-hidden p-6 transition-colors duration-700 ${isDark ? 'bg-transparent border-none shadow-none text-white' : 'rounded-xl border border-white/60 glass-panel shadow-xl'}`}>
+          <p className={`text-xs font-black uppercase tracking-widest drop-shadow-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Join at</p>
+          <p className={`mt-2 font-mono text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{window.location.host}/join</p>
+          <p className={`mt-8 text-xs font-black uppercase tracking-widest drop-shadow-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Code</p>
+          <div className={`mt-2 flex items-center justify-between gap-2 rounded-lg p-3 shadow-inner border ${isDark ? 'bg-white/10 border-white/20' : 'bg-white/40 border-white/50'}`}>
+            <span className={`font-mono text-3xl font-black tracking-[0.2em] drop-shadow-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{session?.join_code}</span>
             <button
-              className="rounded-md p-2 text-gray-600 hover:bg-white/60 hover:text-black border border-transparent hover:border-white/80 hover:shadow-sm transition-all"
+              className={`rounded-md p-2 transition-all border border-transparent ${isDark ? 'text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/40' : 'text-gray-600 hover:text-black hover:bg-white/60 hover:border-white/80'}`}
               onClick={() => {
-                navigator.clipboard.writeText(session.join_code);
-                toast.success("Code copied");
+                const code = session?.join_code;
+                if (code) {
+                  navigator.clipboard.writeText(code);
+                  toast.success("Code copied");
+                }
               }}
             >
               <Copy className="h-4 w-4" />
             </button>
           </div>
           {qrDataUrl && (
-            <div className="mt-8 rounded-xl bg-white/50 p-5 border border-white/60 shadow-inner flex flex-col items-center">
-              <img src={qrDataUrl} alt="Join QR code" className="w-full max-w-[200px] rounded-md drop-shadow-sm" />
-              <p className="mt-4 text-center text-xs font-bold text-gray-600">Or scan to join</p>
+            <div className={`mt-8 rounded-xl p-5 shadow-inner flex flex-col items-center border ${isDark ? 'bg-white/10 border-white/20' : 'bg-white/50 border-white/60'}`}>
+              <img src={qrDataUrl} alt="Join QR code" className={`w-full max-w-[200px] rounded-md drop-shadow-sm ${isDark ? 'bg-white p-2' : ''}`} />
+              <p className={`mt-4 text-center text-xs font-bold ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Or scan to join</p>
             </div>
           )}
           <div className="mt-auto pt-8">
-            <p className="text-xs font-bold text-gray-500 text-center">
+            <p className={`text-xs font-bold text-center ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
               ← → to change slide · Esc to end
             </p>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

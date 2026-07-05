@@ -36,7 +36,7 @@ function MCResults({ slide, votes, compact }: Props) {
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-3 pl-1 text-3xl sm:text-4xl font-black text-gray-900 drop-shadow-sm"
+                className="mb-3 pl-1 text-3xl sm:text-4xl font-black text-inherit drop-shadow-sm"
               >
                 {pct}%
               </motion.div>
@@ -46,10 +46,10 @@ function MCResults({ slide, votes, compact }: Props) {
                 initial={{ height: "140px" }}
                 animate={{ height: `calc(140px + ${barPct * 2.2}px)` }}
                 transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                className={`w-full overflow-hidden rounded-2xl flex flex-col shadow-2xl border border-white/60 ${color}`}
+                className={`w-full overflow-hidden rounded-xl flex flex-col shadow-none ${color}`}
               >
                 {c.image_url ? (
-                  <div className="h-[140px] w-full shrink-0 relative overflow-hidden bg-black/5 border-b border-black/10 flex items-center justify-center">
+                  <div className="h-[140px] w-full shrink-0 relative overflow-hidden bg-black/10 flex items-center justify-center">
                     {/* Blurred backdrop to fill empty space */}
                     <div 
                       className="absolute inset-0 bg-cover bg-center blur-md opacity-40 scale-110" 
@@ -63,7 +63,7 @@ function MCResults({ slide, votes, compact }: Props) {
                     />
                   </div>
                 ) : (
-                  <div className="flex h-[140px] w-full shrink-0 items-center justify-center bg-white/20 border-b border-black/10">
+                  <div className="flex h-[140px] w-full shrink-0 items-center justify-center bg-white/20">
                     <span className="text-xs font-bold uppercase tracking-widest text-black/40">No Image</span>
                   </div>
                 )}
@@ -72,7 +72,7 @@ function MCResults({ slide, votes, compact }: Props) {
                 </div>
               </motion.div>
 
-              <div className="mt-4 pl-1 text-lg sm:text-xl font-bold text-gray-900 drop-shadow-sm truncate w-full">
+              <div className="mt-4 pl-1 text-lg sm:text-xl font-bold text-inherit drop-shadow-sm truncate w-full">
                 {c.label || "—"}
               </div>
             </div>
@@ -91,7 +91,7 @@ function MCResults({ slide, votes, compact }: Props) {
             <motion.div
               layout
               key={c.id}
-              className="relative overflow-hidden rounded-xl border border-white/60 glass-panel px-4 py-3 shadow-md"
+              className="relative overflow-hidden rounded-xl px-4 py-3 bg-gray-500/10 border border-gray-500/20 shadow-none"
             >
               <motion.div
                 className="absolute inset-y-0 left-0 bg-blue-500/20"
@@ -104,11 +104,11 @@ function MCResults({ slide, votes, compact }: Props) {
                   {c.image_url && (
                     <img src={c.image_url} alt={c.label} className="w-12 h-12 object-cover rounded shadow-sm border border-white/50" />
                   )}
-                  <span className={compact ? "text-sm font-bold text-gray-900 drop-shadow-sm" : "text-base font-bold text-gray-900 drop-shadow-sm"}>
+                  <span className={compact ? "text-sm font-bold text-inherit drop-shadow-sm" : "text-base font-bold text-inherit drop-shadow-sm"}>
                     {c.label || "—"}
                   </span>
                 </div>
-                <span className="font-mono text-sm font-bold text-gray-700">
+                <span className="font-mono text-sm font-bold text-inherit opacity-80">
                   {c.count} · {pct}%
                 </span>
               </div>
@@ -191,7 +191,7 @@ function OpenTextResults({ votes, compact }: { votes: Vote[]; compact?: boolean 
             layout
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-md border border-border bg-card px-4 py-3 text-sm shadow-sm"
+            className="rounded-xl glass-panel bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-5 py-4 text-base font-medium shadow-sm backdrop-blur-md"
           >
             {v.text}
           </motion.div>

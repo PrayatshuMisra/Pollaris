@@ -165,18 +165,13 @@ function AudienceView() {
   }
 
   const bgUrl = (slide?.config as any)?.bg_image_url as string | undefined;
+  const isDark = (slide?.config as any)?.design?.theme === 'dark';
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {bgUrl && (
-        <div 
-          className="fixed inset-0 bg-cover bg-center z-0 opacity-30 blur-sm pointer-events-none transition-all duration-1000 ease-in-out"
-          style={{ backgroundImage: `url(${bgUrl})` }}
-        />
-      )}
-      <div className="mx-auto flex max-w-xl flex-col px-6 py-10 relative z-10">
-        <div className="mb-8 flex items-center justify-between text-sm font-medium text-muted-foreground">
-          <span>Session <span className="font-mono tracking-widest text-foreground">{session.join_code}</span></span>
+    <div className={`min-h-screen transition-colors duration-700 ${isDark ? 'bg-[#222222] text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <div className="mx-auto flex max-w-xl flex-col px-6 py-10">
+        <div className={`mb-8 flex items-center justify-between text-sm font-medium ${isDark ? 'text-gray-400' : 'text-muted-foreground'}`}>
+          <span>Session <span className={`font-mono tracking-widest ${isDark ? 'text-white' : 'text-foreground'}`}>{session.join_code}</span></span>
           <span className="flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Live
           </span>
@@ -295,33 +290,58 @@ function SlideResponder({
     );
   }
 
+  const fontSize = (slide.config as any)?.design?.fontSize || 'normal';
+  const titleSizes = {
+    normal: "text-2xl md:text-3xl",
+    large: "text-3xl md:text-4xl",
+    huge: "text-4xl md:text-5xl"
+  };
+  const descSizes = {
+    normal: "text-sm",
+    large: "text-base",
+    huge: "text-lg"
+  };
+
+  const isDark = (slide.config as any)?.design?.theme === 'dark';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="rounded-xl border border-border glass-panel p-8 md:p-10 shadow-sm relative overflow-hidden"
+      className={`relative p-8 md:p-10 overflow-hidden transition-colors duration-700 ${isDark ? 'bg-transparent border-none shadow-none text-white' : 'rounded-xl border shadow-sm glass-panel border-border bg-card text-foreground'} ${((slide.config as any)?.design?.font || 'font-sans')}`}
     >
-      <div className="flex items-start justify-between gap-4 mb-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mt-1">
-          {slide.type.replace("_", " ")}
-        </p>
-        {timeLeft !== null && (
-          <div className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md shadow-sm border shrink-0 ${timeLeft <= 5 ? "bg-red-100/80 text-red-700 border-red-200 animate-pulse" : "bg-white/60 text-blue-700 border-blue-200"}`}>
-            <Timer className="h-3.5 w-3.5" /> {timeLeft}s left
-          </div>
-        )}
-      </div>
-      <h1 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">
-        {slide.question || "Question"}
-      </h1>
-      {slide.description && <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{slide.description}</p>}
+      {(slide.config as any)?.bg_image_url && (
+        <>
+          <div 
+            className={`absolute ${isDark ? 'inset-[-200%]' : 'inset-0'} bg-cover bg-center z-[-2] opacity-40 transition-all duration-1000 ease-in-out`}
+            style={{ backgroundImage: `url(${(slide.config as any).bg_image_url})` }}
+          />
+          <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/80 backdrop-blur-sm'} z-[-1] pointer-events-none`} />
+        </>
+      )}
+      <div className="relative z-10 flex flex-col">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mt-1">
+            {slide.type.replace("_", " ")}
+          </p>
+          {timeLeft !== null && (
+            <div className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md shadow-sm border shrink-0 ${timeLeft <= 5 ? "bg-red-100/80 text-red-700 border-red-200 animate-pulse" : "bg-white/60 text-blue-700 border-blue-200"}`}>
+              <Timer className="h-3.5 w-3.5" /> {timeLeft}s left
+            </div>
+          )}
+        </div>
+        <h1 className={`mt-3 ${titleSizes[fontSize as keyof typeof titleSizes]} font-semibold tracking-tight`}>
+          {slide.question || "Question"}
+        </h1>
+        {slide.description && <p className={`mt-3 ${descSizes[fontSize as keyof typeof descSizes]} text-muted-foreground leading-relaxed opacity-90`}>{slide.description}</p>}
 
-      <div className="mt-8">
-        {slide.type === "multiple_choice" && <MCResponder slide={slide} onSubmit={submit} submitting={submitting} />}
-        {slide.type === "word_cloud" && <WordResponder onSubmit={submit} submitting={submitting} maxLen={40} />}
-        {slide.type === "rating" && <RatingResponder onSubmit={submit} submitting={submitting} />}
-        {slide.type === "open_text" && <WordResponder onSubmit={submit} submitting={submitting} maxLen={280} multiline />}
+        <div className="mt-8">
+          {slide.type === "multiple_choice" && <MCResponder slide={slide} onSubmit={submit} submitting={submitting} isDark={isDark} />}
+          {slide.type === "word_cloud" && <WordResponder onSubmit={submit} submitting={submitting} maxLen={40} isDark={isDark} />}
+          {slide.type === "rating" && <RatingResponder onSubmit={submit} submitting={submitting} isDark={isDark} />}
+          {slide.type === "open_text" && <WordResponder onSubmit={submit} submitting={submitting} maxLen={280} multiline isDark={isDark} />}
+        </div>
       </div>
     </motion.div>
   );
@@ -331,10 +351,12 @@ function MCResponder({
   slide,
   onSubmit,
   submitting,
+  isDark,
 }: {
   slide: Slide;
   onSubmit: (v: Record<string, unknown>) => void;
   submitting: boolean;
+  isDark?: boolean;
 }) {
   const choices = (slide.config as { choices?: { id: string; label: string; image_url?: string }[] })?.choices ?? [];
   return (
@@ -344,7 +366,7 @@ function MCResponder({
           key={c.id}
           disabled={submitting}
           onClick={() => onSubmit({ choice_id: c.id })}
-          className="group relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-white/60 glass-panel bg-white/40 p-5 text-center transition-all hover:bg-white/60 hover:border-blue-400 hover:shadow-md disabled:opacity-50 min-h-[5rem]"
+          className={`group relative flex flex-col items-center justify-center overflow-hidden rounded-xl border p-5 text-center transition-all hover:border-blue-400 hover:shadow-md disabled:opacity-50 min-h-[5rem] ${isDark ? 'border-white/20 bg-white/10 text-white hover:bg-white/20' : 'border-black/10 bg-white/80 shadow-sm text-gray-900 hover:bg-white backdrop-blur-md'}`}
         >
           {c.image_url && (
             <div className="mb-3 w-full h-32 relative overflow-hidden rounded-lg flex items-center justify-center border border-white/50 bg-black/5">
@@ -359,7 +381,7 @@ function MCResponder({
               />
             </div>
           )}
-          <span className="text-base font-bold text-gray-900 drop-shadow-sm">{c.label || "—"}</span>
+          <span className={`text-base font-bold drop-shadow-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{c.label || "—"}</span>
         </button>
       ))}
     </div>
@@ -371,11 +393,13 @@ function WordResponder({
   submitting,
   maxLen,
   multiline,
+  isDark,
 }: {
   onSubmit: (v: Record<string, unknown>) => void;
   submitting: boolean;
   maxLen: number;
   multiline?: boolean;
+  isDark?: boolean;
 }) {
   const [text, setText] = useState("");
   return (
@@ -388,13 +412,13 @@ function WordResponder({
       }}
     >
       {multiline ? (
-        <Textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={maxLen} rows={4} placeholder="Type your response…" className="resize-none" />
+        <Textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={maxLen} rows={4} placeholder="Type your response…" className={`resize-none ${isDark ? 'bg-white/10 text-white border-white/20 placeholder:text-gray-500' : 'bg-white/80 backdrop-blur-md border-black/10 text-gray-900 shadow-sm placeholder:text-gray-400 focus-visible:ring-black/20'}`} />
       ) : (
-        <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={maxLen} placeholder="A word or phrase" autoFocus className="h-12" />
+        <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={maxLen} placeholder="A word or phrase" autoFocus className={`h-12 ${isDark ? 'bg-white/10 text-white border-white/20 placeholder:text-gray-500' : 'bg-white/80 backdrop-blur-md border-black/10 text-gray-900 shadow-sm placeholder:text-gray-400 focus-visible:ring-black/20'}`} />
       )}
       <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{text.length}/{maxLen}</span>
-        <Button type="submit" disabled={submitting || !text.trim()} className="rounded-md font-medium">
+        <span className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{text.length}/{maxLen}</span>
+        <Button type="submit" disabled={submitting || !text.trim()} className={`rounded-md font-medium ${isDark ? 'bg-white text-black hover:bg-white/90' : 'bg-black text-white hover:bg-gray-800'}`}>
           {submitting ? "Sending…" : "Submit"}
         </Button>
       </div>
@@ -405,9 +429,11 @@ function WordResponder({
 function RatingResponder({
   onSubmit,
   submitting,
+  isDark,
 }: {
   onSubmit: (v: Record<string, unknown>) => void;
   submitting: boolean;
+  isDark?: boolean;
 }) {
   const [hover, setHover] = useState(0);
   const [value, setValue] = useState(0);
@@ -424,14 +450,14 @@ function RatingResponder({
             disabled={submitting}
           >
             <Star
-              className={`h-12 w-12 transition-colors ${(hover || value) >= n ? "fill-primary text-primary" : "text-muted-foreground/30 fill-transparent"}`}
+              className={`h-12 w-12 transition-colors ${(hover || value) >= n ? (isDark ? "fill-white text-white" : "fill-black text-black") : (isDark ? "text-white/20 fill-transparent" : "text-black/10 fill-transparent")}`}
               strokeWidth={1.5}
             />
           </button>
         ))}
       </div>
       <div className="mt-8 flex justify-center">
-        <Button onClick={() => value > 0 && onSubmit({ rating: value })} disabled={submitting || value === 0} className="rounded-md font-medium px-8 h-10">
+        <Button onClick={() => value > 0 && onSubmit({ rating: value })} disabled={submitting || value === 0} className={`rounded-md font-medium px-8 h-10 ${isDark ? 'bg-white text-black hover:bg-white/90' : 'bg-black text-white hover:bg-gray-800'}`}>
           {submitting ? "Sending…" : "Submit"}
         </Button>
       </div>
