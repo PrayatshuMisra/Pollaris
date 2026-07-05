@@ -164,9 +164,17 @@ function AudienceView() {
     );
   }
 
+  const bgUrl = (slide?.config as any)?.bg_image_url as string | undefined;
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex max-w-xl flex-col px-6 py-10">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {bgUrl && (
+        <div 
+          className="fixed inset-0 bg-cover bg-center z-0 opacity-30 blur-sm pointer-events-none transition-all duration-1000 ease-in-out"
+          style={{ backgroundImage: `url(${bgUrl})` }}
+        />
+      )}
+      <div className="mx-auto flex max-w-xl flex-col px-6 py-10 relative z-10">
         <div className="mb-8 flex items-center justify-between text-sm font-medium text-muted-foreground">
           <span>Session <span className="font-mono tracking-widest text-foreground">{session.join_code}</span></span>
           <span className="flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">

@@ -8,9 +8,40 @@ import { Plus, Trash2, Image as ImageIcon, X } from "lucide-react";
 interface Props {
   slide: Slide;
   onChange: (patch: Partial<Slide>) => void;
+  onApplyBackgroundToAll?: (bgUrl: string) => void;
 }
 
-export function SlideEditor({ slide, onChange }: Props) {
+export function SlideEditor({ slide, onChange, onApplyBackgroundToAll }: Props) {
+  const bgInputRef = useRef<HTMLInputElement>(null);
+  const bgUrl = (slide.config as any)?.bg_image_url as string | undefined;
+
+  function handleBgUpload(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+        const MAX = 1920;
+        if (width > height && width > MAX) {
+          height *= MAX / width; width = MAX;
+        } else if (height > MAX) {
+          width *= MAX / height; height = MAX;
+        }
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+        onChange({ config: { ...(slide.config as any), bg_image_url: dataUrl } });
+        if (bgInputRef.current) bgInputRef.current.value = "";
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -35,7 +66,37 @@ export function SlideEditor({ slide, onChange }: Props) {
         />
       </div>
 
-      <div className="pt-4">
+      <div className="pt-2">
+        <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 drop-shadow-sm">Background Image</label>
+        <input type="file" ref={bgInputRef} className="hidden" accept="image/*" onChange={handleBgUpload} />
+        <div className="mt-2 flex flex-col gap-2">
+          {bgUrl ? (
+            <div className="flex flex-col gap-2">
+              <div className="relative h-24 w-full rounded-xl overflow-hidden border border-white/60 shadow-sm">
+                <img src={bgUrl} alt="Slide background" className="absolute inset-0 w-full h-full object-cover" />
+                <Button size="icon" variant="destructive" className="absolute top-1 right-1 h-6 w-6 rounded-full" onClick={() => {
+                  const nextConfig = { ...(slide.config as any) };
+                  delete nextConfig.bg_image_url;
+                  onChange({ config: nextConfig });
+                }}>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+              {onApplyBackgroundToAll && (
+                <Button variant="outline" size="sm" className="w-full text-xs font-bold glass" onClick={() => onApplyBackgroundToAll(bgUrl)}>
+                  Apply background to all slides
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" className="w-full h-10 border-dashed border-white/80 bg-white/40 font-bold text-gray-600 hover:bg-white/60 hover:text-black shadow-sm" onClick={() => bgInputRef.current?.click()}>
+              <ImageIcon className="mr-2 h-4 w-4" /> Upload background
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="pt-2">
         {slide.type === "multiple_choice" && <MCEditor slide={slide} onChange={onChange} />}
         {slide.type === "word_cloud" && <TypeHint text="Audience submits short words or phrases. The most common ones grow biggest." />}
         {slide.type === "rating" && <TypeHint text="Audience picks 1 to 5 stars. You'll see the live average." />}

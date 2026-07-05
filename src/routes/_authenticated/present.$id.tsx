@@ -244,8 +244,17 @@ function PresentPage() {
     );
   }
 
+  const bgUrl = (currentSlide?.config as any)?.bg_image_url as string | undefined;
+
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-transparent font-sans text-gray-900 pt-20">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-transparent font-sans text-gray-900 pt-20 relative min-h-screen">
+      {bgUrl && (
+        <div 
+          className="fixed inset-0 bg-cover bg-center z-0 opacity-30 blur-sm pointer-events-none transition-all duration-1000 ease-in-out"
+          style={{ backgroundImage: `url(${bgUrl})` }}
+        />
+      )}
+      <div className="relative z-10 flex flex-col flex-1 w-full h-full">
       {/* Header bar */}
       <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1800px] z-50">
         <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-2 rounded-full backdrop-blur-2xl bg-white/20 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all">
@@ -351,6 +360,7 @@ function PresentPage() {
             </p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

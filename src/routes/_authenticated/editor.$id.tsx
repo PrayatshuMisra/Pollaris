@@ -320,14 +320,20 @@ function EditorPage() {
         </aside>
 
         {/* Center Canvas */}
-        <main className="flex-1 bg-transparent overflow-auto flex items-center justify-center p-4 sm:p-6 lg:p-8 relative min-h-[400px]">
+        <main className="flex-1 overflow-auto flex items-center justify-center p-4 sm:p-6 lg:p-8 relative min-h-[400px]">
+          {selectedSlide && (selectedSlide.config as any)?.bg_image_url && (
+            <div 
+              className="absolute inset-0 bg-cover bg-center z-0 opacity-40 blur-sm"
+              style={{ backgroundImage: `url(${(selectedSlide.config as any).bg_image_url})` }}
+            />
+          )}
           {selectedSlide ? (
             <motion.div
               key={selectedSlide.id}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2 }}
-              className="glass-panel rounded-2xl shadow-2xl border border-white/80 p-6 sm:p-8 lg:p-12 flex flex-col justify-center text-center overflow-hidden"
+              className="relative z-10 glass-panel rounded-2xl shadow-2xl border border-white/80 p-6 sm:p-8 lg:p-12 flex flex-col justify-center text-center overflow-hidden bg-white/70 backdrop-blur-xl"
               style={{
                 aspectRatio: "16/9",
                 width: "100%",
@@ -335,27 +341,35 @@ function EditorPage() {
                 maxWidth: "calc((100vh - 12rem) * 16 / 9)"
               }}
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-black drop-shadow-sm break-words">
-                {selectedSlide.question || "Your question here"}
-              </h1>
-              {selectedSlide.description && (
-                <p className="mt-6 text-xl text-gray-700 font-medium">
-                  {selectedSlide.description}
-                </p>
+              {(selectedSlide.config as any)?.bg_image_url && (
+                <div 
+                  className="absolute inset-0 bg-cover bg-center z-0 opacity-20"
+                  style={{ backgroundImage: `url(${(selectedSlide.config as any).bg_image_url})` }}
+                />
               )}
-              {selectedSlide.type === "multiple_choice" && (
-                <div className="mt-12 grid grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
-                  {((selectedSlide.config as any)?.choices || []).map((c: any, i: number) => (
-                    <div key={c.id} className="glass-panel bg-white/40 border-white/60 p-4 rounded-xl font-bold text-gray-800 shadow-sm flex items-center justify-center gap-3">
-                      {c.image_url && <img src={c.image_url} alt="option" className="w-10 h-10 rounded-md object-cover shadow-sm" />}
-                      <span className="truncate">{c.label || `Option ${i + 1}`}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-black drop-shadow-sm break-words w-full">
+                  {selectedSlide.question || "Your question here"}
+                </h1>
+                {selectedSlide.description && (
+                  <p className="mt-6 text-xl text-gray-800 font-medium drop-shadow-sm">
+                    {selectedSlide.description}
+                  </p>
+                )}
+                {selectedSlide.type === "multiple_choice" && (
+                  <div className="mt-12 grid grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
+                    {((selectedSlide.config as any)?.choices || []).map((c: any, i: number) => (
+                      <div key={c.id} className="glass-panel bg-white/60 border-white/60 p-4 rounded-xl font-bold text-gray-900 shadow-sm flex items-center justify-center gap-3 backdrop-blur-md">
+                        {c.image_url && <img src={c.image_url} alt="option" className="w-10 h-10 rounded-md object-cover shadow-sm" />}
+                        <span className="truncate">{c.label || `Option ${i + 1}`}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           ) : (
-            <div className="text-center text-sm font-bold text-gray-700 glass px-6 py-3 rounded-full shadow-lg border border-white/60">Select a slide to edit</div>
+            <div className="text-center text-sm font-bold text-gray-700 glass px-6 py-3 rounded-full shadow-lg border border-white/60 z-10">Select a slide to edit</div>
           )}
         </main>
 
@@ -376,7 +390,28 @@ function EditorPage() {
                 
                 {/* Slide Editor Fields */}
                 <div className="border-t border-white/40 pt-6">
-                  <SlideEditor slide={selectedSlide} onChange={patchSlideLocal} />
+                  <SlideEditor 
+                    slide={selectedSlide} 
+                    onChange={patchSlideLocal} 
+                    onApplyBackgroundToAll={async (bgUrl) => {
+                      const nextSlides = slides.map((s) => ({
+                        ...s,
+                        config: { ...(s.config as any), bg_image_url: bgUrl },
+                      }));
+                      qc.setQueryData(["slides", id], nextSlides);
+                      toast.info("Applying background to all slides...");
+                      try {
+                        await Promise.all(
+                          nextSlides.map((s) =>
+                            supabase.from("slides").update({ config: s.config as never }).eq("id", s.id)
+                          )
+                        );
+                        toast.success("Applied background to all slides");
+                      } catch (e) {
+                        toast.error("Failed to apply background");
+                      }
+                    }} 
+                  />
                 </div>
 
                 {/* Timer Configuration */}
