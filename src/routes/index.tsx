@@ -407,10 +407,7 @@ function Footer() {
           <Logo />
         </div>
         <p className="flex items-center drop-shadow-sm">
-          Made with <span className="text-red-500 mx-1.5">❤</span> by
-          <a href="https://github.com/PrayatshuMisra" target="_blank" rel="noreferrer" className="ml-1.5 text-blue-700 hover:text-blue-900 hover:underline transition-colors">
-            Prayatshu Misra
-          </a>
+          Made with <span className="text-red-500 mx-1.5">❤</span> by Soumi Misra
         </p>
         <p className="text-gray-500">© {new Date().getFullYear()} Pollaris.</p>
       </div>
