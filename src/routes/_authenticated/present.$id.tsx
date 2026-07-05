@@ -299,6 +299,15 @@ function PresentPage() {
       <div className="grid flex-1 grid-cols-1 gap-6 p-6 md:grid-cols-[1fr_320px]">
         {/* Main stage */}
         <div className={`flex flex-col p-8 md:p-12 relative overflow-hidden transition-colors duration-700 ${isDark ? 'bg-transparent border-none shadow-none text-white' : 'rounded-xl border bg-white/70 border-white/80 glass-panel shadow-2xl text-black backdrop-blur-xl'}`}>
+          {bgUrl && (
+            <>
+              <div 
+                className={`absolute ${isDark ? 'inset-[-200%]' : 'inset-0'} bg-cover bg-center z-[0] opacity-40 transition-all duration-1000 ease-in-out`}
+                style={{ backgroundImage: `url(${bgUrl})` }}
+              />
+              <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/80 backdrop-blur-sm'} z-[1] pointer-events-none`} />
+            </>
+          )}
           <AnimatePresence mode="wait">
             {currentSlide && (
               <motion.div
@@ -309,34 +318,25 @@ function PresentPage() {
                 transition={{ duration: 0.35 }}
                 className="flex-1 flex flex-col relative z-10"
               >
-                {bgUrl && (
-                  <>
-                    <div 
-                      className={`absolute ${isDark ? 'inset-[-200%]' : 'inset-0'} bg-cover bg-center z-[-2] opacity-40 transition-all duration-1000 ease-in-out`}
-                      style={{ backgroundImage: `url(${bgUrl})` }}
-                    />
-                    <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/40 backdrop-blur-sm'} z-[-1] pointer-events-none`} />
-                  </>
-                )}
-                <p className={`text-xs font-black uppercase tracking-widest drop-shadow-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className={`text-xs font-black uppercase tracking-widest drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}`}>
                   {currentSlide.type.replace("_", " ")}
                 </p>
                 <h1 className={`mt-4 ${titleSizes[fontSize as keyof typeof titleSizes]} font-black tracking-tight text-inherit drop-shadow-sm`}>
                   {currentSlide.question || "Untitled question"}
                 </h1>
                 {currentSlide.description && (
-                  <p className={`mt-4 ${descSizes[fontSize as keyof typeof descSizes]} opacity-90 font-medium leading-relaxed`}>{currentSlide.description}</p>
+                  <p className={`mt-4 ${descSizes[fontSize as keyof typeof descSizes]} font-medium leading-relaxed ${isDark ? 'text-white' : 'text-black'}`}>{currentSlide.description}</p>
                 )}
                 <div className="mt-10 flex-1">
-                  <ResultsView slide={currentSlide} votes={votes} />
+                  <ResultsView slide={currentSlide} votes={votes} isDark={isDark} />
                 </div>
-                <div className={`mt-8 flex items-center justify-between border-t pt-5 text-sm font-bold ${isDark ? 'border-white/10 text-gray-400' : 'border-white/40 text-gray-600'}`}>
+                <div className={`mt-8 flex items-center justify-between border-t pt-5 text-sm font-bold ${isDark ? 'border-white/20 text-white' : 'border-black/20 text-black'}`}>
                   <span>{votes.length} vote{votes.length === 1 ? "" : "s"}</span>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => goto(-1)} disabled={currentIdx === 0} className={`rounded-md h-8 w-8 p-0 transition-colors ${isDark ? 'bg-transparent border-white/20 text-white hover:bg-white/10' : 'glass border-white/60 text-gray-900 hover:bg-white/60'}`}>
+                    <Button size="sm" variant="outline" onClick={() => goto(-1)} disabled={currentIdx === 0} className={`rounded-md h-8 w-8 p-0 transition-colors ${isDark ? 'bg-transparent border-white/20 text-white hover:bg-white/10' : 'bg-white/60 border-black/20 text-black hover:bg-white'}`}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => goto(1)} disabled={currentIdx >= slides.length - 1} className={`rounded-md h-8 w-8 p-0 transition-colors ${isDark ? 'bg-transparent border-white/20 text-white hover:bg-white/10' : 'glass border-white/60 text-gray-900 hover:bg-white/60'}`}>
+                    <Button size="sm" variant="outline" onClick={() => goto(1)} disabled={currentIdx >= slides.length - 1} className={`rounded-md h-8 w-8 p-0 transition-colors ${isDark ? 'bg-transparent border-white/20 text-white hover:bg-white/10' : 'bg-white/60 border-black/20 text-black hover:bg-white'}`}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

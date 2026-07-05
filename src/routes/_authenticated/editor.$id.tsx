@@ -361,21 +361,21 @@ function EditorPage() {
                   <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/40 backdrop-blur-sm'} z-[-1] pointer-events-none`} />
                 </>
               )}
-              <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
-                <h1 className={`${titleSizes[fontSize as keyof typeof titleSizes]} font-black drop-shadow-sm break-words w-full`}>
-                  {selectedSlide.question || "Your question here"}
-                </h1>
-                {selectedSlide.description && (
-                  <p className={`mt-6 ${descSizes[fontSize as keyof typeof descSizes]} font-medium drop-shadow-sm opacity-90`}>
-                    {selectedSlide.description}
-                  </p>
-                )}
+                <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+                  <h1 className={`mb-4 ${titleSizes[fontSize as keyof typeof titleSizes]} font-black tracking-tight drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}`}>
+                    {selectedSlide.question || "Untitled question"}
+                  </h1>
+                  {selectedSlide.description && (
+                    <p className={`mb-8 ${descSizes[fontSize as keyof typeof descSizes]} max-w-2xl font-medium leading-relaxed ${isDark ? 'text-white' : 'text-black'}`}>
+                      {selectedSlide.description}
+                    </p>
+                  )}
                 {selectedSlide.type === "multiple_choice" && (
                   <div className="mt-12 grid grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
                     {((selectedSlide.config as any)?.choices || []).map((c: any, i: number) => (
-                      <div key={c.id} className={`glass-panel border p-4 rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 backdrop-blur-md ${(selectedSlide.config as any)?.design?.theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-white/60 border-white/60'}`}>
+                      <div key={c.id} className={`glass-panel border p-4 rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 backdrop-blur-md ${isDark ? 'bg-white/10 border-white/20 text-white' : 'bg-white/60 border-black/10 text-black'}`}>
                         {c.image_url && <img src={c.image_url} alt="option" className="w-10 h-10 rounded-md object-cover shadow-sm" />}
-                        <span className="truncate">{c.label || `Option ${i + 1}`}</span>
+                        <span className="truncate drop-shadow-sm">{c.label || `Option ${i + 1}`}</span>
                       </div>
                     ))}
                   </div>

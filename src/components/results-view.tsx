@@ -7,16 +7,17 @@ interface Props {
   slide: Slide;
   votes: Vote[];
   compact?: boolean;
+  isDark?: boolean;
 }
 
-export function ResultsView({ slide, votes, compact }: Props) {
-  if (slide.type === "multiple_choice") return <MCResults slide={slide} votes={votes} compact={compact} />;
-  if (slide.type === "word_cloud") return <WordCloudResults votes={votes} compact={compact} />;
-  if (slide.type === "rating") return <RatingResults votes={votes} compact={compact} />;
-  return <OpenTextResults votes={votes} compact={compact} />;
+export function ResultsView({ slide, votes, compact, isDark }: Props) {
+  if (slide.type === "multiple_choice") return <MCResults slide={slide} votes={votes} compact={compact} isDark={isDark} />;
+  if (slide.type === "word_cloud") return <WordCloudResults votes={votes} compact={compact} isDark={isDark} />;
+  if (slide.type === "rating") return <RatingResults votes={votes} compact={compact} isDark={isDark} />;
+  return <OpenTextResults votes={votes} compact={compact} isDark={isDark} />;
 }
 
-function MCResults({ slide, votes, compact }: Props) {
+function MCResults({ slide, votes, compact, isDark }: Props) {
   const { choices, total } = tallyMultipleChoice(slide, votes);
   const max = Math.max(1, ...choices.map((c) => c.count));
   const hasImages = choices.some((c) => !!c.image_url);
@@ -36,7 +37,7 @@ function MCResults({ slide, votes, compact }: Props) {
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-3 pl-1 text-3xl sm:text-4xl font-black text-inherit drop-shadow-sm"
+                className={`mb-3 pl-1 text-3xl sm:text-4xl font-black drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}`}
               >
                 {pct}%
               </motion.div>
@@ -72,7 +73,7 @@ function MCResults({ slide, votes, compact }: Props) {
                 </div>
               </motion.div>
 
-              <div className="mt-4 pl-1 text-lg sm:text-xl font-bold text-inherit drop-shadow-sm truncate w-full">
+              <div className={`mt-4 pl-1 text-lg sm:text-xl font-bold drop-shadow-sm truncate w-full ${isDark ? 'text-white' : 'text-black'}`}>
                 {c.label || "—"}
               </div>
             </div>
@@ -104,11 +105,11 @@ function MCResults({ slide, votes, compact }: Props) {
                   {c.image_url && (
                     <img src={c.image_url} alt={c.label} className="w-12 h-12 object-cover rounded shadow-sm border border-white/50" />
                   )}
-                  <span className={compact ? "text-sm font-bold text-inherit drop-shadow-sm" : "text-base font-bold text-inherit drop-shadow-sm"}>
+                  <span className={compact ? `text-sm font-bold drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}` : `text-base font-bold drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}`}>
                     {c.label || "—"}
                   </span>
                 </div>
-                <span className="font-mono text-sm font-bold text-inherit opacity-80">
+                <span className={`font-mono text-sm font-bold drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}`}>
                   {c.count} · {pct}%
                 </span>
               </div>
@@ -119,11 +120,11 @@ function MCResults({ slide, votes, compact }: Props) {
   );
 }
 
-function WordCloudResults({ votes, compact }: { votes: Vote[]; compact?: boolean }) {
+function WordCloudResults({ votes, compact, isDark }: { votes: Vote[]; compact?: boolean; isDark?: boolean }) {
   const words = tallyWords(votes).slice(0, 40);
   const max = Math.max(1, ...words.map((w) => w.count));
   if (words.length === 0) {
-    return <p className="text-center text-sm text-muted-foreground">Waiting for words…</p>;
+    return <p className={`text-center text-sm font-medium ${isDark ? 'text-white/80' : 'text-black/80'}`}>Waiting for words…</p>;
   }
   return (
     <div className={`flex flex-wrap items-center justify-center gap-3 ${compact ? "" : "px-4 py-8"}`}>
@@ -138,7 +139,7 @@ function WordCloudResults({ votes, compact }: { votes: Vote[]; compact?: boolean
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               style={{ fontSize: `${scale}rem` }}
-              className="font-semibold tracking-tight text-foreground"
+              className={`font-bold tracking-tight drop-shadow-sm ${isDark ? 'text-white' : 'text-black'}`}
             >
               <span>
                 {w.word}
@@ -151,7 +152,7 @@ function WordCloudResults({ votes, compact }: { votes: Vote[]; compact?: boolean
   );
 }
 
-function RatingResults({ votes, compact }: { votes: Vote[]; compact?: boolean }) {
+function RatingResults({ votes, compact, isDark }: { votes: Vote[]; compact?: boolean; isDark?: boolean }) {
   const { avg, count } = tallyRating(votes);
   return (
     <div className={`text-center ${compact ? "py-2" : "py-6"}`}>
@@ -159,7 +160,7 @@ function RatingResults({ votes, compact }: { votes: Vote[]; compact?: boolean })
         key={avg}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className={`font-semibold tracking-tight text-foreground ${compact ? "text-4xl" : "text-7xl"}`}
+        className={`font-black tracking-tight drop-shadow-sm ${isDark ? 'text-white' : 'text-black'} ${compact ? "text-4xl" : "text-7xl"}`}
       >
         {avg.toFixed(1)}
       </motion.div>
@@ -167,20 +168,20 @@ function RatingResults({ votes, compact }: { votes: Vote[]; compact?: boolean })
         {[1, 2, 3, 4, 5].map((i) => (
           <Star
             key={i}
-            className={`${compact ? "h-4 w-4" : "h-6 w-6"} ${i <= Math.round(avg) ? "fill-primary text-primary" : "text-muted-foreground/30 fill-transparent"}`}
+            className={`${compact ? "h-4 w-4" : "h-6 w-6"} ${i <= Math.round(avg) ? "fill-primary text-primary" : (isDark ? "text-white/20 fill-transparent" : "text-black/10 fill-transparent")}`}
             strokeWidth={1.5}
           />
         ))}
       </div>
-      <p className="mt-2 text-sm text-muted-foreground">{count} response{count === 1 ? "" : "s"}</p>
+      <p className={`mt-2 text-sm font-bold ${isDark ? 'text-white/80' : 'text-black/80'}`}>{count} response{count === 1 ? "" : "s"}</p>
     </div>
   );
 }
 
-function OpenTextResults({ votes, compact }: { votes: Vote[]; compact?: boolean }) {
+function OpenTextResults({ votes, compact, isDark }: { votes: Vote[]; compact?: boolean; isDark?: boolean }) {
   const items = tallyOpenText(votes);
   if (items.length === 0) {
-    return <p className="text-center text-sm text-muted-foreground">Waiting for responses…</p>;
+    return <p className={`text-center text-sm font-medium ${isDark ? 'text-white/80' : 'text-black/80'}`}>Waiting for responses…</p>;
   }
   return (
     <div className={`grid gap-2 ${compact ? "" : "md:grid-cols-2"}`}>
@@ -191,7 +192,7 @@ function OpenTextResults({ votes, compact }: { votes: Vote[]; compact?: boolean 
             layout
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl glass-panel bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-5 py-4 text-base font-medium shadow-sm backdrop-blur-md"
+            className={`rounded-xl border px-5 py-4 text-base font-bold shadow-sm backdrop-blur-md ${isDark ? 'bg-white/10 border-white/20 text-white' : 'bg-white/60 border-black/10 text-black'}`}
           >
             {v.text}
           </motion.div>
