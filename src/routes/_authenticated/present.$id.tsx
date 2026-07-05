@@ -305,7 +305,7 @@ function PresentPage() {
                 className={`absolute ${isDark ? 'inset-[-200%]' : 'inset-0'} bg-cover bg-center z-[0] opacity-40 transition-all duration-1000 ease-in-out`}
                 style={{ backgroundImage: `url(${bgUrl})` }}
               />
-              <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/80 backdrop-blur-sm'} z-[1] pointer-events-none`} />
+              <div className={`absolute ${isDark ? 'inset-[-200%] bg-[#222222]/80' : 'inset-0 bg-white/40 backdrop-blur-sm'} z-[1] pointer-events-none`} />
             </>
           )}
           <AnimatePresence mode="wait">
